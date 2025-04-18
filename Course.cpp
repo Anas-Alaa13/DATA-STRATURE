@@ -10,7 +10,7 @@ private:
     string courseCode;
     string syllabus;
     int creditHours;
-    unordered_map<string, vector<string>> grades;
+    unordered_map<string, vector<string>> prequesites;
 
 public:
     
