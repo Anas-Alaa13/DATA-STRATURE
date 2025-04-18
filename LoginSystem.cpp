@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <limits>
+#include <string>
 using namespace std;
 
 void LoginSystem::displayMenu() {
@@ -21,12 +22,30 @@ void LoginSystem::displayMenu() {
 
         while (true) {
             cout << "\nEnter your choice: ";
-            if (!(cin >> choice)) {
-                cout << "\nInvalid input. Please enter a number.\n";
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                continue;
+            string inputStr;
+            int choice;
+
+            while (true) {
+                cout << "Enter your choice: ";
+                getline(cin, inputStr);  
+
+                bool isNumber = true;
+                for (char ch : inputStr) {
+                    if (!isdigit(ch)) {
+                        isNumber = false;
+                        break;
+                    }
+                }
+
+                if (isNumber && !inputStr.empty()) {
+                    choice = stoi(inputStr);  
+                    break;
+                }
+                else {
+                    cout << "\nInvalid input. Please enter a valid number.\n";
+                }
             }
+
 
             switch (choice) {
             case 1:

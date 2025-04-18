@@ -5,17 +5,16 @@
 #include <cstdlib>
 #include <sstream>
 #include <limits>
+#include <algorithm>
 using namespace std;
 
 
 
 
 
-
-
 void UserManager::login() {
-    string username, password, storedUser, storedPass;
-    string id, fName, lName, phone, email;
+    string username, password, line;
+    string id, fname, lname, phone, storedUser, storedPass, email;
     bool isLoggedIn = false;
 
     system("cls");
@@ -25,8 +24,17 @@ void UserManager::login() {
     cout << "PASSWORD: ";
     cin >> password;
 
-    ifstream input("database.txt");
-    while (input >> id >> fName >> lName >> phone >> storedUser >> storedPass >> email) {
+    ifstream input("database.csv");
+    while (getline(input, line)) {
+        stringstream ss(line);
+        getline(ss, id, ',');
+        getline(ss, fname, ',');
+        getline(ss, lname, ',');
+        getline(ss, phone, ',');
+        getline(ss, storedUser, ',');
+        getline(ss, storedPass, ',');
+        getline(ss, email, ',');
+
         if (storedUser == username && storedPass == password) {
             isLoggedIn = true;
             break;
@@ -43,19 +51,31 @@ void UserManager::login() {
     system("pause");
 }
 
+
+
+
+
+
+
+
+
 void UserManager::registerUser() {
     int id = 1;
     string username, password, confirmPassword, PhoneNumber, Email, FirstName, LastName;
 
-    ifstream input("database.txt");
-    string line, lastId;
+    ifstream input("database.csv");
+    string line, lastLine;
     while (getline(input, line)) {
-        istringstream iss(line);
-        iss >> lastId;
+        if (!line.empty() && line.find(',') != string::npos) {
+            lastLine = line;
+        }
     }
     input.close();
 
-    if (!lastId.empty()) {
+    if (!lastLine.empty()) {
+        stringstream ss(lastLine);
+        string lastId;
+        getline(ss, lastId, ',');
         id = stoi(lastId) + 1;
     }
 
@@ -65,35 +85,102 @@ void UserManager::registerUser() {
     cin >> FirstName;
     cout << " Enter the Last Name: ";
     cin >> LastName;
-    cout << " Enter the Phone Number: ";
-    cin >> PhoneNumber;
+    while (true) {
+        cout << " Enter the Phone Number: ";
+        cin >> PhoneNumber;
+        bool isValid = true;
+        if (PhoneNumber.length() != 11) {
+            isValid = false;
+        }
+        else {
+            for (int i = 0; i < 11; i++) {
+                if (!isdigit(PhoneNumber[i])) {
+                    isValid = false;
+                    break;
+                }
+            }
+        }
+        if (isValid) {
+            break;
+        }
+        else {
+            cout << "\nInvalid phone number. It must be exactly 11 digits.\n";
+        }
+    }
+
     cout << " Enter the Email: ";
     cin >> Email;
-    cout << " Enter the username: ";
-    cin >> username;
-    cout << " Enter the password: ";
-    cin >> password;
+    while (true) {
+        cout << " Enter the username: ";
+        cin >> username;
+        ifstream checkUsername("database.csv");
+        getline(checkUsername, line); 
+        bool userExists = false;
+        while (getline(checkUsername, line)) {
+            stringstream ss(line);
+            string temp;
+            for (int i = 0; i < 4; ++i) getline(ss, temp, ','); 
+            getline(ss, temp, ','); 
+            if (temp == username) {
+                userExists = true;
+                break;
+            }
+        }
+        checkUsername.close();
+
+        if (userExists) {
+            cout << "\nUsername already exists. Please try another one.\n";
+        }
+        else {
+            break;
+        }
+    }
+    while (true) {
+        cout << " Enter the password (min 8 characters): ";
+        cin >> password;
+
+        if (password.length() >= 8) {
+            break;
+        }
+        else {
+            cout << "\nPassword too short. Please enter at least 8 characters.\n";
+        }
+    }
+
     while (true) {
         cout << " Confirm the password: ";
         cin >> confirmPassword;
-
         if (password == confirmPassword) {
             break;
         }
         else {
             cout << "\nPasswords do not match. Please try again.\n";
         }
-
-}
-        ofstream reg("database.txt", ios::app);
-        reg << id << ' ' << FirstName << ' ' << LastName << ' ' << PhoneNumber << ' ' << username << ' ' << password << ' ' << Email << endl;
-        reg.close();
-        /*ofstream reg("database.csv", ios::app);
-  reg << id << ',' << FirstName << ',' << LastName << ',' << PhoneNumber << ',' << username << ',' << password << ',' << Email << '\n';
-        */
-        cout << "\nRegistration Successful\n";
-        system("pause");
     }
+
+    ifstream checkFile("database.csv");
+    bool isEmpty = checkFile.peek() == ifstream::traits_type::eof();
+    checkFile.close();
+
+    ofstream reg("database.csv", ios::app);
+    if (isEmpty) {
+        reg << "ID,FirstName,LastName,PhoneNumber,Username,Password,Email\n"; 
+    }
+
+    reg << id << ',' << FirstName << ',' << LastName << ',' << PhoneNumber << ',' << username << ',' << password << ',' << Email << '\n';
+    reg.close();
+
+    cout << "\nRegistration Successful\n";
+    system("pause");
+}
+
+
+
+
+
+
+
+
 
 void UserManager::forgot() {
     int choice;
@@ -106,24 +193,51 @@ void UserManager::forgot() {
         cout << "3. Main menu\n";
         cout << "Enter your choice: ";
 
-        if (!(cin >> choice)) {
-            cout << "\nInvalid input. Please enter a number.\n";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            continue;
+        string inputStr;
+        int choice;
+
+        while (true) {
+            cout << "Enter your choice: ";
+            getline(cin, inputStr); 
+
+            bool isNumber = true;
+            for (char ch : inputStr) {
+                if (!isdigit(ch)) {
+                    isNumber = false;
+                    break;
+                }
+            }
+
+            if (isNumber && !inputStr.empty()) {
+                choice = stoi(inputStr);  
+                break;
+            }
+            else {
+                cout << "\nInvalid input. Please enter a valid number.\n";
+            }
         }
+
 
         switch (choice) {
         case 1: {
-            string searchUser, storedUser, storedPass;
-            string id, fName, lName, phone, email;
+            string searchUser, line;
+            string id, fname, lname, phone, storedUser, storedPass, email;
             bool found = false;
 
             cout << "\nEnter your remembered username: ";
             cin >> searchUser;
 
-            ifstream search("database.txt");
-            while (search >> id >> fName >> lName >> phone >> storedUser >> storedPass >> email) {
+            ifstream search("database.csv");
+            while (getline(search, line)) {
+                stringstream ss(line);
+                getline(ss, id, ',');
+                getline(ss, fname, ',');
+                getline(ss, lname, ',');
+                getline(ss, phone, ',');
+                getline(ss, storedUser, ',');
+                getline(ss, storedPass, ',');
+                getline(ss, email, ',');
+
                 if (storedUser == searchUser) {
                     found = true;
                     cout << "\nAccount found!\nYour password is: " << storedPass << endl;
@@ -139,15 +253,24 @@ void UserManager::forgot() {
             break;
         }
         case 2: {
-            string searchPass, storedUser, storedPass;
-            string id, fName, lName, phone, email;
+            string searchPass, line;
+            string id, fname, lname, phone, storedUser, storedPass, email;
             bool found = false;
 
             cout << "\nEnter your remembered password: ";
             cin >> searchPass;
 
-            ifstream search("database.txt");
-            while (search >> id >> fName >> lName >> phone >> storedUser >> storedPass >> email) {
+            ifstream search("database.csv");
+            while (getline(search, line)) {
+                stringstream ss(line);
+                getline(ss, id, ',');
+                getline(ss, fname, ',');
+                getline(ss, lname, ',');
+                getline(ss, phone, ',');
+                getline(ss, storedUser, ',');
+                getline(ss, storedPass, ',');
+                getline(ss, email, ',');
+
                 if (storedPass == searchPass) {
                     found = true;
                     cout << "\nPassword found!\nYour username is: " << storedUser << endl;
