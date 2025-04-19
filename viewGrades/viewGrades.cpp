@@ -49,7 +49,7 @@ void viewGrades(const string& studentID) {
              << setw(10) << grade.score << endl;
     }
     cout << "--------------------------------------------" << endl;
-}
+}//ay haga
 
 int main() {
     initializeDummyData(); // Load dummy data
@@ -58,7 +58,7 @@ int main() {
         cout << "Enter Student ID (or 'exit' to quit): ";
         cin >> studentID;
         if (studentID == "exit") break;
-        viewGrades(studentID); // Display grades for entered ID
+        viewGrades(studentID); // Display grades for entered Id
     }
     return 0;
 }
