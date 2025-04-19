@@ -1,0 +1,4 @@
+CourseCode,CourseTitle,CreditHours,Syllabus,Prerequisites
+CS101,Intro to Programming,3,Learn basics of programming,Math001
+CS102,OOP,3,Object-oriented programming,CS101|Math001
+CS201,Data Structures,4,Arrays, stacks, queues,CS102
