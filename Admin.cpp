@@ -28,7 +28,7 @@ void Admin::UploadCourse() {
         cout << "enter creditHours\n";
         cin >> creditHours;
 
-        Course course(title, code, syllabus, creditHours);
+        Course course(title,syllabus, creditHours,instructorName);
 
         courses.push_back(course);
         ofstream file("Test.csv", ios::app);
