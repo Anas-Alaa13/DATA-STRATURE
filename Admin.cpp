@@ -11,7 +11,7 @@ void Admin::UploadCourse() {
     int creditHours;
     string choice;
     vector<Course>courses;
-    ofstream file("Test.csv", ios::app);
+    ofstream file("course.csv", ios::app);
     file << "Title,Code,Syllabus,creditHourses,Instructor\n";
     file.close();
     do {
