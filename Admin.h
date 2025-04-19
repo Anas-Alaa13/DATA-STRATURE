@@ -12,6 +12,6 @@ private:
 
 public:
     Admin();
-   Admin( string id,  string name,  string password);
-   
+   Admin( string id,  string name,  string password); 
+   void UploadCourse(); 
 };
