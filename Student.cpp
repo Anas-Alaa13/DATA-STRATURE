@@ -15,6 +15,45 @@ Student::Student(int id, string username, string password, vector<string> enroll
     this->grades = grades;
 }
 
+
+
+Course Student::findcourse(string search) {
+    ifstream file("course.csv");
+    string line;
+    getline(file, line); 
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string courseCodeFromFile, courseTitle, creditHoursStr, syllabus, prereqStr;
+
+        getline(ss, courseCodeFromFile, ',');
+        getline(ss, courseTitle, ',');
+        getline(ss, creditHoursStr, ',');
+        getline(ss, syllabus, ',');
+        getline(ss, prereqStr);
+
+        int creditHours = stoi(creditHoursStr);
+        Course course(courseTitle, courseCodeFromFile, syllabus, creditHours);
+
+        stringstream preSS(prereqStr);
+        string pre;
+        while (getline(preSS, pre, '|')) {
+            course.addPrerequisite(pre);
+        }
+
+       
+        if (search == courseCodeFromFile || search == courseTitle) {
+            file.close();
+            return course;
+        }
+    }
+
+    file.close();
+    return Course();
+}
+
+
+
 bool Student::alreadyregistered(string input) {
     Course course=findcourse(input);
     string courseCode=course.getCourseCode();
@@ -54,37 +93,3 @@ void Student::registercourse(string input) {
     }
 }
   
-Course Student::findcourse(string search) {
-    ifstream file("course.csv");
-    string line;
-    getline(file, line); 
-
-    while (getline(file, line)) {
-        stringstream ss(line);
-        string courseCodeFromFile, courseTitle, creditHoursStr, syllabus, prereqStr;
-
-        getline(ss, courseCodeFromFile, ',');
-        getline(ss, courseTitle, ',');
-        getline(ss, creditHoursStr, ',');
-        getline(ss, syllabus, ',');
-        getline(ss, prereqStr);
-
-        int creditHours = stoi(creditHoursStr);
-        Course course(courseTitle, courseCodeFromFile, syllabus, creditHours);
-
-        stringstream preSS(prereqStr);
-        string pre;
-        while (getline(preSS, pre, '|')) {
-            course.addPrerequisite(pre);
-        }
-
-       
-        if (search == courseCodeFromFile || search == courseTitle) {
-            file.close();
-            return course;
-        }
-    }
-
-    file.close();
-    return Course();
-}
