@@ -1,4 +1,5 @@
 #include "Student.h"
+#include"Course.h"
 #include <iostream>
 #include<sstream>
 #include<fstream>
@@ -14,23 +15,36 @@ Student::Student(int id, string username, string password, vector<string> enroll
     this->grades = grades;
 }
 
-bool Student::alreadyregistered(string courseCode) {
+bool Student::alreadyregistered(string input) {
+    Course course=findcourse(input);
+    string courseCode=course.getCourseCode();
+    
+    if(courseCode==""){
+        return false;}
+    
     return find(enrolledCourses.begin(), enrolledCourses.end(), courseCode)
         != enrolledCourses.end(); /*  لو لا يساوي هو كده لقاه رترن ترو
     لقاه يبقى متسجلوش تاني*/
 }
 
 
-void Student::registercourse(string coursecode) {
+void Student::registercourse(string input) {
 
-    if (!alreadyregistered(coursecode) && check(coursecode)) {
+    Course course=findcourse(input);
+    string courseCode=course.getCourseCode();
 
-        enrolledCourses.push_back(coursecode);
+    if(courseCode==""){
+        cout<<"course not found\n";
+        return;}
+
+    if (!alreadyregistered(courseCode) && check(courseCode)) {
+
+        enrolledCourses.push_back(courseCode);
 
          
         ofstream file("database.csv", ios::app);
         if (file.is_open()) {
-            file << UserName << "," << coursecode << "\n";
+            file << UserName << "," << courseCode << "\n";
             file.close();
             cout << "Course registered successfully." << endl;
         }
