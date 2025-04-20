@@ -15,7 +15,7 @@ void Admin::UploadCourse() {
     int creditHours;
     string choice;
     vector<Course>courses;
-    ofstream file("Test.csv", ios::app);
+    ofstream file("course.csv", ios::app);
     file << "Title,Code,Syllabus,creditHourses,Instructor\n";
     file.close();
     do {
@@ -32,10 +32,14 @@ void Admin::UploadCourse() {
         cout << "enter creditHours\n";
         cin >> creditHours;
 
+<<<<<<< HEAD
         Course course(courseTitle,syllabus, creditHours,instructorName);
+=======
+        Course course(title,code,syllabus, creditHours,instructorName);
+>>>>>>> 8587dd453d3b15ce94dbc3afc76918efade32757
 
         courses.push_back(course);
-        ofstream file("Test.csv", ios::app);
+        ofstream file("course.csv", ios::app);
 
         file << title << "," << code << "," << syllabus << "," << instructorName << "," << creditHours;
         file.close();
