@@ -31,7 +31,7 @@ void Admin::UploadCourse() {
         Course course(title,code,syllabus, creditHours,instructorName);
 
         courses.push_back(course);
-        ofstream file("Test.csv", ios::app);
+        ofstream file("course.csv", ios::app);
 
         file << title << "," << code << "," << syllabus << "," << instructorName << "," << creditHours;
         file.close();
