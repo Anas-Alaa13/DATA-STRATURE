@@ -1,4 +1,5 @@
 #include "UserManager.h"
+#include "Admin.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -37,6 +38,11 @@ void UserManager::login() {
 
         if (storedUser == username && storedPass == password) {
             isLoggedIn = true;
+            if (username=="admin")
+            {
+                Admin admin;
+                   admin.displayMenu();
+            }
             break;
         }
     }
@@ -171,6 +177,11 @@ void UserManager::registerUser() {
     reg.close();
 
     cout << "\nRegistration Successful\n";
+    if (username == "admin")
+    {
+        Admin admin;
+        admin.displayMenu();
+    }
     system("pause");
 }
 

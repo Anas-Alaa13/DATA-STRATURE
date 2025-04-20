@@ -1,23 +1,20 @@
-#include <iostream>
+#ifndef COURSE_H
+#define COURSE_H
+
+
 #include <string>
-#include <vector>
-#include<unordered_map>
 using namespace std;
 
 class Course {
-private:
-    string courseTitle;
-    string courseCode;
+public:
+    string title;
     string syllabus;
     int creditHours;
-    unordered_map<string, vector<string>> prequesites;
+    string instructor;
 
-public:
-    
     Course();
-    Course(string courseTitle,string courseCode,string syllabus,int creditHours, unordered_map<string, vector<string>> grades);
-
-    
-  
-   
+    Course(string t, string s, int ch, string i);
+    void saveToFile(const string& filename);
 };
+
+#endif

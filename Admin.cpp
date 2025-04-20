@@ -1,51 +1,94 @@
+#include "Admin.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include<vector>
-#include "Admin.h"
 #include "Course.h"
 
 
 using namespace std;
+Admin::Admin() {
+    // Constructor implementation (can be empty if no initialization is needed)
+}
 
-void Admin::UploadCourse() {
+void Admin::displayMenu() {
+    int choice;
+    while (true) {
+        system("cls");
+        cout << "***********************************************************************\n\n";
+        cout << "                      Welcome Yaaa Admin                            \n\n";
+        cout << "*******************        MENU        *******************************\n\n";
+        cout << "1. UploadCourse " << endl;
+        cout << "2. Set Prerequistes" << endl;
+        cout << "3. Manage Student Grade " << endl;
+        cout << "4. EXIT" << endl;
+
+        while (true) {
+            cout << "\nEnter your choice: ";
+            string inputStr;
+            int choice;
+
+            while (true) {
+                cout << "Enter your choice: ";
+                getline(cin, inputStr);
+
+                bool isNumber = true;
+                for (char ch : inputStr) {
+                    if (!isdigit(ch)) {
+                        isNumber = false;
+                        break;
+                    }
+                }
+
+                if (isNumber && !inputStr.empty()) {
+                    choice = stoi(inputStr);
+                    break;
+                }
+                else {
+                    cout << "\nInvalid input. Please enter a valid number.\n";
+                }
+            }
 
 
-    string title, code, syllabus, instructorName;
+            switch (choice) {
+            case 1:
+                uploadCourse("courses.csv");
+                break;
+            /*case 2:
+                Set_Prerequistes();
+                break;
+            case 3:
+                Manage_Student_Grade();
+                break;*/
+            case 4:
+                cout << "Salaaaam Yaaa Admin.\n";
+                exit(0);
+            default:
+                cout << "Invalid choice, please try again.\n";
+                continue;
+            }
+            break;
+        }
+    }
+}
+
+
+
+
+void Admin::uploadCourse(const string& filename) {
+    string title, syllabus, instructor;
     int creditHours;
-    string choice;
-    vector<Course>courses;
-    ofstream file("course.csv", ios::app);
-    file << "Title,Code,Syllabus,creditHourses,Instructor\n";
-    file.close();
-    do {
 
+    cout << "Enter course title: ";
+    getline(cin, title);
+    cout << "Enter syllabus: ";
+    getline(cin, syllabus);
+    cout << "Enter credit hours: ";
+    cin >> creditHours;
+    cin.ignore(); 
+    cout << "Enter instructor name: ";
+    getline(cin, instructor);
 
-        cout << "enter title of course\n";
-        cin >> title;
-        cout << "enter code of course\n";
-        cin >> code;
-        cout << "enter syllabus of course\n";
-        cin >> syllabus;
-        cout << "enter instructorName\n";
-        cin >> instructorName;
-        cout << "enter creditHours\n";
-        cin >> creditHours;
-
-<<<<<<< HEAD
-        Course course(courseTitle,syllabus, creditHours,instructorName);
-=======
-        Course course(title,code,syllabus, creditHours,instructorName);
->>>>>>> 8587dd453d3b15ce94dbc3afc76918efade32757
-
-        courses.push_back(course);
-        ofstream file("course.csv", ios::app);
-
-        file << title << "," << code << "," << syllabus << "," << instructorName << "," << creditHours;
-        file.close();
-
-
-        cout << "Do you want to add another course? (y/n): ";
-        cin >> choice;
-
-    } while (choice == "yes" || choice == "y");
+    Course newCourse(title, syllabus, creditHours, instructor);
+    newCourse.saveToFile(filename);
+}

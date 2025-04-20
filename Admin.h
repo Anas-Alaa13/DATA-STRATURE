@@ -1,17 +1,11 @@
 #pragma once
 #include <string>
 #include<iostream>
-#include "User.h"
 using namespace std;
 
-class Admin :public User {
-private:
-    string id;
-    string name;
-    string password;
-
+class Admin {
 public:
     Admin();
-   Admin( string id,  string name,  string password); 
-   void UploadCourse(); 
+    void displayMenu();
+    void uploadCourse(const string& filename);
 };
