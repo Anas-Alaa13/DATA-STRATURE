@@ -2,6 +2,10 @@
 #include <fstream>
 #include <string>
 #include<vector>
+#include "Admin.h"
+#include "Course.h"
+
+
 using namespace std;
 
 void Admin::UploadCourse() {
@@ -28,7 +32,7 @@ void Admin::UploadCourse() {
         cout << "enter creditHours\n";
         cin >> creditHours;
 
-        Course course(title,syllabus, creditHours,instructorName);
+        Course course(courseTitle,syllabus, creditHours,instructorName);
 
         courses.push_back(course);
         ofstream file("Test.csv", ios::app);
