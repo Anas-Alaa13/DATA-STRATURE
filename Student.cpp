@@ -93,3 +93,27 @@ void Student::registercourse(string input) {
     }
 }
   
+float student::calcGPA() {
+	int totalHours = 0;
+	float totalPoints = 0;
+
+	for (Course c : enrolledCourses) {
+		totalHours += c.credithours;
+		totalPoints += c.grade * c.credithours;
+	}
+	if (totalHours == 0)
+		return 0;
+	return totalPoints / totalHours;
+}
+
+void student::printReport() {
+	cout << "NAME: " << UserName << endl;
+	cout << "ID: " << id << endl;
+	cout << "GPA: " << calcGPA() << endl;
+	for (Course c : enrolledCourses)
+		c.printCourse();
+}
+
+void student::addCourse(Course c) {
+	enrolledCourses.push_back(c);
+}
