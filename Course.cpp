@@ -30,3 +30,6 @@ void Course::saveToFile(const string& filename) {
     }
 }
 
+void Course::printCourse() {
+    cout << courseTitle << "(" << semester << " ,Grade: " << grade << " ,Credit Hours: " << creditHours << ")" << endl;
+}
