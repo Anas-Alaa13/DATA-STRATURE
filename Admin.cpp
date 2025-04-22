@@ -4,6 +4,7 @@
 #include <string>
 #include<vector>
 #include "Course.h"
+#include<unordered_map>
 
 
 using namespace std;
@@ -79,7 +80,7 @@ void Admin::displayMenu() {
 void Admin::uploadCourse(const string& filename) {
     string title, syllabus, instructor;
     int creditHours;
-
+    unordered_map<int, Course>courses;
     cout << "Enter course title: ";
     getline(cin, title);
     cout << "Enter syllabus: ";
@@ -91,5 +92,7 @@ void Admin::uploadCourse(const string& filename) {
     getline(cin, instructor);
 
     Course newCourse(title, syllabus, creditHours, instructor);
+        courses.insert(make_pair(id,newCourse))
+
     newCourse.saveToFile(filename);
 }
