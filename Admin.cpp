@@ -77,22 +77,26 @@ void Admin::displayMenu() {
 
 
 
+unordered_map<int, Course>courses;
 void Admin::uploadCourse(const string& filename) {
     string title, syllabus, instructor;
-    int creditHours;
-    unordered_map<int, Course>courses;
+    int creditHours,code;
     cout << "Enter course title: ";
     getline(cin, title);
+    cout << "Enter course code: ";
+    cin >> code;
+    cin.ignore();
     cout << "Enter syllabus: ";
     getline(cin, syllabus);
     cout << "Enter credit hours: ";
     cin >> creditHours;
-    cin.ignore(); 
+    cin.ignore();
     cout << "Enter instructor name: ";
     getline(cin, instructor);
 
-    Course newCourse(title, syllabus, creditHours, instructor);
-        courses.insert(make_pair(id,newCourse))
 
-    newCourse.saveToFile(filename);
+    Course newCourse(title, syllabus, creditHours, instructor);
+    courses.insert(make_pair(code, newCourse));
+
+        newCourse.saveToFile(filename);
 }
