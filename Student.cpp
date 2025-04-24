@@ -1,119 +1,84 @@
-#include "Student.h"
+﻿#include "Student.h"
+#include "LoginSystem.h"
+
 #include"Course.h"
 #include <iostream>
 #include<sstream>
 #include<fstream>
 #include<algorithm>
+#include "UserManager.h"
+#include <set>
 using namespace std;
 Student::Student() {}
-
-Student::Student(int id, string username, string password, vector<string> enrolledCourses,map<string ,double> grades) {
-    this->id = id;
-    this->UserName = username;
-    this->Password = password;
-    this->enrolledCourses = enrolledCourses;
-    this->grades = grades;
+void Student::setUsername(const std::string& user) {
+    username = user;
 }
+void Student::displayMenu() {
+    int choice;
+    while (true) {
+        system("cls");
+        cout << "***********************************************************************\n\n";
+        cout << "                      Welcome Yaaa TaleB                            \n\n";
+        cout << "*******************        MENU        *******************************\n\n";
+        cout << "1. Serch For Courses " << endl;
+        cout << "2. Regester" << endl;
+        cout << "3. viewRegisteredCourses"<<endl;
+        cout << "4. EXIT" << endl;
 
+        while (true) {
+            cout << "\nEnter your choice: ";
+            string inputStr;
+            int choice;
 
+            while (true) {
+                cout << "Enter your choice: ";
+                getline(cin, inputStr);
 
-Course Student::findcourse(string search) {
-    ifstream file("course.csv");
-    string line;
-    getline(file, line); 
+                bool isNumber = true;
+                for (char ch : inputStr) {
+                    if (!isdigit(ch)) {
+                        isNumber = false;
+                        break;
+                    }
+                }
 
-    while (getline(file, line)) {
-        stringstream ss(line);
-        string courseCodeFromFile, courseTitle, creditHoursStr, syllabus, prereqStr;
+                if (isNumber && !inputStr.empty()) {
+                    choice = stoi(inputStr);
+                    break;
+                }
+                else {
+                    cout << "\nInvalid input. Please enter a valid number.\n";
+                }
+            }
 
-        getline(ss, courseCodeFromFile, ',');
-        getline(ss, courseTitle, ',');
-        getline(ss, creditHoursStr, ',');
-        getline(ss, syllabus, ',');
-        getline(ss, prereqStr);
-
-        int creditHours = stoi(creditHoursStr);
-        Course course(courseTitle, courseCodeFromFile, syllabus, creditHours);
-
-        stringstream preSS(prereqStr);
-        string pre;
-        while (getline(preSS, pre, '|')) {
-            course.addPrerequisite(pre);
-        }
-
-       
-        if (search == courseCodeFromFile || search == courseTitle) {
-            file.close();
-            return course;
-        }
-    }
-
-    file.close();
-    return Course();
-}
-
-
-
-bool Student::alreadyregistered(string input) {
-    Course course=findcourse(input);
-    string courseCode=course.getCourseCode();
-    
-    if(courseCode==""){
-        return false;}
-    
-    return find(enrolledCourses.begin(), enrolledCourses.end(), courseCode)
-        != enrolledCourses.end(); /*  لو لا يساوي هو كده لقاه رترن ترو
-    لقاه يبقى متسجلوش تاني*/
-}
-
-
-void Student::registercourse(string input) {
-
-    Course course=findcourse(input);
-    string courseCode=course.getCourseCode();
-
-    if(courseCode==""){
-        cout<<"course not found\n";
-        return;}
-
-    if (!alreadyregistered(courseCode) && check(courseCode)) {
-
-        enrolledCourses.push_back(courseCode);
-
-         
-        ofstream file("database.csv", ios::app);
-        if (file.is_open()) {
-            file << UserName << "," << courseCode << "\n";
-            file.close();
-            cout << "Course registered successfully." << endl;
+            UserManager user;
+            switch (choice) {
+            case 1:
+                findcourse();
+                break;
+            case 2:
+                registercourse();
+                break;
+            case 3:
+                viewRegisteredCourses();
+                    break;
+                case 4:
+                    cout << "Salaaaam Yaaa TaleB.\n";
+                    LoginSystem l;
+                    l.displayMenu();
+             break;
+            default:
+                cout << "Invalid choice, please try again.\n";
+                continue;
+            }
+            break;
         }
     }
-    else {
-        cout << "either course is registed before or prerequists arenot met ." << endl;
-    }
 }
-  
-float student::calcGPA() {
-	int totalHours = 0;
-	float totalPoints = 0;
-
-	for (Course c : enrolledCourses) {
-		totalHours += c.credithours;
-		totalPoints += c.grade * c.credithours;
-	}
-	if (totalHours == 0)
-		return 0;
-	return totalPoints / totalHours;
+bool Student::findcourse() {
+}
+void Student::registercourse() { 
+}
+void Student::viewRegisteredCourses() {  
 }
 
-void student::printReport() {
-	cout << "NAME: " << UserName << endl;
-	cout << "ID: " << id << endl;
-	cout << "GPA: " << calcGPA() << endl;
-	for (Course c : enrolledCourses)
-		c.printCourse();
-}
-
-void student::addCourse(Course c) {
-	enrolledCourses.push_back(c);
-}

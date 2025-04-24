@@ -1,5 +1,7 @@
 #include "LoginSystem.h"
 #include "UserManager.h"
+#include "Student.h"
+#include "Admin.h"
 #include <iostream>
 #include <cstdlib>
 #include <limits>
@@ -8,8 +10,6 @@ using namespace std;
 
 void LoginSystem::displayMenu() {
     UserManager user;
-    int choice;
-
     while (true) {
         system("cls");
         cout << "***********************************************************************\n\n";
@@ -17,7 +17,7 @@ void LoginSystem::displayMenu() {
         cout << "*******************        MENU        *******************************\n\n";
         cout << "1. LOGIN" << endl;
         cout << "2. REGISTER" << endl;
-        cout << "3. FORGOT PASSWORD (or) USERNAME" << endl;
+        cout << "3. FORGOT PASSWORD ?? " << endl;
         cout << "4. EXIT" << endl;
 
         while (true) {

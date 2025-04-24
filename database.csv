@@ -1,2 +1,7 @@
 ID,FirstName,LastName,PhoneNumber,Username,Password,Email
-1,Anas,Alaa,01027014209,A_A,12345678,aa
+0,Mohamed,Alaa,1027014206,admin,12345678,Mohamed.com
+2023170105,Ahmed,Yehia,1146824940,Ahmed-Yehia,12345678,ahmed.com
+2023170106,Anas,Alaa,1027014209,Anas-Alaa,87654321,anas.com
+2023170107,Anas,Nabil,1151980735,Anas-Nabil,12345678,nabil.com
+2023170108,Abdallah,Walid,1102641995,Abdallah-Walid,12345678,Abdallah
+2023170108,Mohamed,Rageb,1553337276,Mohamed-Ragab,12345678,MohamedR.com

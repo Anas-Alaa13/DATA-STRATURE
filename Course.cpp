@@ -1,15 +1,24 @@
 #include "Course.h"
+#include"Student.h"
 #include <fstream>
 #include <iostream>
 using namespace std;
 
+#include "Course.h"
 
-Course::Course(string t, string s, int ch, string i) {
+Course::Course()
+    : title(""), syllabus(""), creditHours(0), instructor(""), prerequisites("") {
+}
+
+
+Course::Course(string t, string s, string ch, string i, string p) {
     title = t;
     syllabus = s;
     creditHours = ch;
     instructor = i;
+    prerequisites = p;
 }
+
 void Course::saveToFile(const string& filename) {
     bool isEmpty = false;
     ifstream checkFile(filename);
@@ -18,10 +27,8 @@ void Course::saveToFile(const string& filename) {
 
     ofstream file(filename, ios::app);
     if (file.is_open()) {
-        if (isEmpty) {
-            file << "Course_title,syllabus,creditHours,instructor\n";
-        }
-        file << title << "," << syllabus << "," << creditHours << "," << instructor << "\n";
+   
+        file << title << "," << syllabus << "," << creditHours << "," << instructor << "," << prerequisites << "\n";
         file.close();
         cout << "Course saved successfully!\n";
     }
@@ -30,6 +37,4 @@ void Course::saveToFile(const string& filename) {
     }
 }
 
-void Course::printCourse() {
-    cout << courseTitle << "(" << semester << " ,Grade: " << grade << " ,Credit Hours: " << creditHours << ")" << endl;
-}
+

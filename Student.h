@@ -1,24 +1,23 @@
-#pragma once
+﻿#pragma once
 #include <string>
 #include <vector>
 #include<map>
-#include "User.h"
 using namespace std;
 
-class Student:public User {
+class Student  {
 private:
-    int id;
-    string UserName;
-    string Password;
-    vector<string> enrolledCourses;
-    map<string, double>grades;
+    std::string username;
+
 
 public:
     Student();
-    Student(int id, string password, vector<string>enrolledCourses, map<string, double>grades);
-    
-   
+    void displayMenu();
+    bool Prerequisites();
+    bool findcourse();
+    void setUsername(const std::string& user);
+    void registercourse();
+    void viewRegisteredCourses();
 
-  
+
 
 };
