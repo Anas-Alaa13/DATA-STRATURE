@@ -33,6 +33,10 @@ void student::printReport() {
 	for (Course c : courses)
 		c.printCourse();
 }
+void student::addCourse(Course c) {
+	courses.push_back(c);
+
+}
 void Student::setUsername(const std::string& user) {
     username = user;
 }
