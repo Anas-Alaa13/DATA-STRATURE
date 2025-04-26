@@ -7,16 +7,22 @@ using namespace std;
 #include "Course.h"
 
 Course::Course()
-    : title(""), syllabus(""), creditHours(0), instructor(""), prerequisites("") {
+    : title(""), syllabus(""), creditHours(0), instructor(""), prerequisites(""), semester(""), grade(0.0) {
 }
 
 
-Course::Course(string t, string s, string ch, string i, string p) {
+Course::Course(string t, string s, string ch, string i, string p, float g, string sem) {
     title = t;
     syllabus = s;
     creditHours = ch;
     instructor = i;
     prerequisites = p;
+    semester = sem;
+	grade = g;
+}
+void Course::printCourse() {
+	cout << name << "(" << semster << " ,Grade:" << grade << " ,Credit Hours:" << credithours <<")" <<endl;
+    
 }
 
 void Course::saveToFile(const string& filename) {
