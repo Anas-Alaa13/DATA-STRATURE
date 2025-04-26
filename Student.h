@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include<map>
+#include "Course.h"
 using namespace std;
 
 class Student  {
@@ -13,6 +14,8 @@ public:
     Student();
     string name;
     int id;
+    student(string name, int id);
+    vector<Course> courses;
     void displayMenu();
     bool Prerequisites();
     bool findcourse();
@@ -21,6 +24,7 @@ public:
     void viewRegisteredCourses();
     float calcGPA();
     void printReport();
+    void addCourse(Course c);
 
 
 
