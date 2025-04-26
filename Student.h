@@ -24,7 +24,7 @@ public:
     void viewRegisteredCourses();
     float calcGPA();
     void printReport();
-    void addCourse(Course c);
+   
 
 
 
