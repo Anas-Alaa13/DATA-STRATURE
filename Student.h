@@ -14,6 +14,7 @@ public:
     Student();
     string name;
     int id;
+    vector<Course> courses;
     student(string name, int id);
     void displayMenu();
     bool Prerequisites();
