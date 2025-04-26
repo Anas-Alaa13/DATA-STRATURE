@@ -11,9 +11,12 @@ public:
     string creditHours;
     string instructor;
     string prerequisites;
+    float grade;
+    string semster;
 
     Course();
-    Course(string t, string s, string ch, string i, string p = "");
+    Course(string t, string s, string ch, string i, float g, string sem, string p = "");
+    void printCourse();
     void saveToFile(const string& filename);
 };
 
