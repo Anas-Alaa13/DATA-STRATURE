@@ -9,7 +9,30 @@
 #include "UserManager.h"
 #include <set>
 using namespace std;
-Student::Student() {}
+Student::Student(string name, int id) {
+	name = name;
+	id = id;
+}
+float student::calcGPA() {
+	int totalHours = 0;
+	float totalPoints = 0;
+
+	for (Course c : courses) {
+		totalHours += c.credithours;
+		totalPoints += c.grade * c.credithours;
+	}
+	if (totalHours == 0)
+		return 0;
+	return totalPoints / totalHours;
+
+}
+void student::printReport() {
+	cout << "NAME:" << name << endl;
+	cout << "ID:" << id << endl;
+	cout << "GPA:" << calcGPA() << endl;
+	for (Course c : courses)
+		c.printCourse();
+}
 void Student::setUsername(const std::string& user) {
     username = user;
 }
