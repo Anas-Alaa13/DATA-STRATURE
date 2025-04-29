@@ -1,7 +1,10 @@
+// Anas
+
 #ifndef LOGINSYSTEM_H
 #define LOGINSYSTEM_H
 
-class LoginSystem {
+class LoginSystem
+{
 public:
     void displayMenu();
 };

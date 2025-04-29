@@ -12,6 +12,8 @@
 using namespace std;
 Admin::Admin() {
 }
+
+//Anas
 void Admin::displayMenu() {
     int choice;
     while (true) {
@@ -23,7 +25,8 @@ void Admin::displayMenu() {
         cout << "2. Set Prerequistes" << endl;     
         cout << "3. Edit Student Data " << endl;
         cout << "4. Manage Student Grade " << endl;
-        cout << "5. EXIT" << endl;
+        cout << "5. Delete user " << endl;
+        cout << "6. EXIT" << endl;
 
         while (true) {
             cout << "\nEnter your choice: ";
@@ -64,8 +67,11 @@ void Admin::displayMenu() {
                 break;
             case 4:
                 manageStudentGrades();
-                break;
+                break; 
             case 5:
+                deleteUser();
+                    break;
+            case 6:
                 cout << "Salaaaam Yaaa Admin.\n";
                 LoginSystem l;
               l.displayMenu() ;
@@ -77,6 +83,120 @@ void Admin::displayMenu() {
         }
     }
 }
+void Admin::deleteUser() {
+    ifstream dbFile("database.csv");
+    if (!dbFile.is_open()) {
+        cout << "Error: Could not open database.csv.\n";
+        system("pause");
+        return;
+    }
+
+    map<string, string> userMap;
+    vector<string> allLines; 
+    string line;
+    cout << "\nList of Users:\n";
+    cout << "-----------------------------------\n";
+
+    while (getline(dbFile, line)) {
+        allLines.push_back(line);
+        stringstream ss(line);
+        string id, firstName, lastName, phone, username, password, email;
+        getline(ss, id, ',');
+        getline(ss, firstName, ',');
+        getline(ss, lastName, ',');
+        getline(ss, phone, ',');
+        getline(ss, username, ',');
+        getline(ss, password, ',');
+        getline(ss, email, ',');
+
+        userMap[id] = username;
+        cout << "ID: " << id << " | Username: " << username << " | Name: " << firstName << " " << lastName << "\n";
+    }
+    dbFile.close();
+
+    if (userMap.empty()) {
+        cout << "No users found in the database.\n";
+        system("pause");
+        return;
+    }
+
+    cout << "-----------------------------------\n";
+    cout << "Enter the ID of the user you want to delete: ";
+    string targetID;
+    cin >> targetID;
+
+    if (userMap.find(targetID) == userMap.end()) {
+        cout << "Invalid ID. No user found with the given ID.\n";
+        system("pause");
+        return;
+    }
+
+    {
+        ofstream dbFileOut("database.csv", ios::trunc); 
+        for (const auto& l : allLines) {
+            if (l.find(targetID + ",") != 0) {
+                dbFileOut << l << "\n";
+            }
+        }
+        dbFileOut.close();
+    }
+    cout << "User removed from database.csv.\n";
+
+    {
+        ifstream regFile("registrations.csv");
+        if (!regFile.is_open()) {
+            cout << "Error: Could not open registrations.csv.\n";
+            system("pause");
+            return;
+        }
+
+        vector<string> regLines;
+        while (getline(regFile, line)) {
+            if (line.find(targetID + ",") != 0) {
+                regLines.push_back(line);
+            }
+        }
+        regFile.close();
+
+        ofstream regFileOut("registrations.csv", ios::trunc);
+        for (const auto& l : regLines) {
+            regFileOut << l << "\n";
+        }
+        regFileOut.close();
+    }
+    cout << "User removed from registrations.csv.\n";
+
+    {
+        ifstream gradesFile("grades.csv");
+        if (!gradesFile.is_open()) {
+            cout << "Error: Could not open grades.csv.\n";
+            system("pause");
+            return;
+        }
+
+        vector<string> gradeLines;
+        while (getline(gradesFile, line)) {
+            if (line.find(targetID + ",") != 0) {
+                gradeLines.push_back(line);
+            }
+        }
+        gradesFile.close();
+
+        ofstream gradesFileOut("grades.csv", ios::trunc);
+        for (const auto& l : gradeLines) {
+            gradesFileOut << l << "\n";
+        }
+        gradesFileOut.close();
+    }
+    cout << "User removed from grades.csv.\n";
+
+    cout << "User deletion process completed.\n";
+    system("pause");
+}
+
+
+
+//Abdallah
 void Admin::uploadCourse(const string& filename) {
     string title, syllabus, instructor;
     string creditHours;
@@ -94,6 +214,83 @@ void Admin::uploadCourse(const string& filename) {
     Course newCourse(title, syllabus, creditHours, instructor);
     newCourse.saveToFile(filename);
 }
+void Admin::editStudentData() {
+    system("cls");
+    cout << "=== Edit Student Data ===\n";
+
+    map<string, vector<string>> students; // المفتاح هو اسم المستخدم، والقيمة هي بيانات الطالب
+    vector<string> headers = { "ID", "First Name", "Last Name", "Phone", "Username", "Password", "Email" };
+
+    ifstream infile("database.csv");
+    string line;
+
+    cout << "\nList of all students:\n";
+    cout << "------------------------\n";
+
+    while (getline(infile, line)) {
+        stringstream ss(line);
+        vector<string> studentData;
+        string field;
+
+        while (getline(ss, field, ',')) {
+            studentData.push_back(field);
+        }
+
+        if (studentData.size() == headers.size()) {
+            students[studentData[4]] = studentData; 
+            cout << "- Username: " << studentData[4] << " | Name: " << studentData[1] << " " << studentData[2] << " | ID: " << studentData[0] << endl;
+        }
+    }
+    infile.close();
+
+    string targetUsername;
+    cout << "\nEnter the username of the student you want to edit: ";
+    cin >> targetUsername;
+
+    auto it = students.find(targetUsername);
+    if (it != students.end()) {
+        vector<string>& studentData = it->second;
+
+        cout << "\nStudent found!\n";
+        for (size_t i = 0; i < headers.size(); ++i) {
+            cout << headers[i] << ": " << studentData[i] << "\n";
+        }
+
+        string input;
+        for (size_t i = 0; i < headers.size(); ++i) {
+            cout << "\nChange " << headers[i] << "? (y/n): ";
+            cin >> input;
+            if (input == "y") {
+                cout << "Enter new " << headers[i] << ": ";
+                cin >> studentData[i];
+            }
+        }
+
+        cout << "\nStudent data updated.\n";
+        ofstream outfile("database.csv");
+        for (const auto& pair : students) {
+            const string& username = pair.first;
+            const vector<string>& data = pair.second;
+
+            for (size_t i = 0; i < data.size(); ++i) {
+                outfile << data[i];
+
+                if (i < data.size() - 1) outfile << ",";
+            }
+            outfile << "\n";
+        }
+
+        outfile.close();
+    }
+    else {
+        cout << "\nUsername not found.\n";
+    }
+
+    system("pause");
+}
+
+
+//Ahmed
 void Admin::Set_Prerequistes() {
     ifstream inFile("courses.csv");
     if (!inFile.is_open()) {
@@ -210,151 +407,9 @@ void Admin::Set_Prerequistes() {
         cout << "\n Changes discarded.\n";
     }
 }
-void Admin::editStudentData() {
-    system("cls");
-    cout << "=== Edit Student Data ===\n";
-
-    string line;
-    string id, fname, lname, phone, storedUser, storedPass, email;
-    vector<string> lines;
-    ifstream infile("database.csv");
-    cout << "\nList of all students:\n";
-    cout << "------------------------\n";
-
-    while (getline(infile, line)) {
-        stringstream ss(line);
-        getline(ss, id, ',');
-        getline(ss, fname, ',');
-        getline(ss, lname, ',');
-        getline(ss, phone, ',');
-        getline(ss, storedUser, ',');
-        getline(ss, storedPass, ',');
-        getline(ss, email, ',');
-
-        cout << "- Username: " << storedUser << " | Name: " << fname << " " << lname << " | ID: " << id << endl;
-        lines.push_back(line);
-    }
-
-    infile.close();
-    string targetUsername;
-    cout << "\nEnter the username of the student you want to edit: ";
-    cin >> targetUsername;
-
-    bool found = false;
-    ofstream outfile("database.csv");
-
-    for (string currentLine : lines) {
-        stringstream ss(currentLine);
-        getline(ss, id, ',');
-        getline(ss, fname, ',');
-        getline(ss, lname, ',');
-        getline(ss, phone, ',');
-        getline(ss, storedUser, ',');
-        getline(ss, storedPass, ',');
-        getline(ss, email, ',');
-
-        if (storedUser == targetUsername) {
-            found = true;
-
-            cout << "\nStudent found!\n";
-            cout << "ID: " << id << "\n";
-            cout << "Name: " << fname << " " << lname << "\n";
-            cout << "Phone: " << phone << "\n";
-            cout << "Username: " << storedUser << "\n";
-            cout << "Password: " << storedPass << "\n";
-            cout << "Email: " << email << "\n";
-
-            string input;
-
-            cout << "\nChange ID? (y/n): ";
-            cin >> input;
-            if (input == "y") {
-                string newId;
-                bool idExists = false;
-
-                cout << "Enter new ID: ";
-                cin >> newId;
-                for (const string& otherLine : lines) {
-                    stringstream ss(otherLine);
-                    string tempId, temp;
-                    getline(ss, tempId, ','); 
-                    getline(ss, temp, ',');   
-                    getline(ss, temp, ',');  
-                    getline(ss, temp, ',');   
-                    getline(ss, temp, ',');   
-
-                    if (tempId == newId && temp != storedUser) {
-                        idExists = true;
-                        break;
-                    }
-                }
-
-                if (idExists) {
-                    cout << "\n This ID already exists for another user. Keeping the old ID.\n";
-                }
-                else {
-                    id = newId;
-                }
-            }
 
 
-            cout << "Change first name? (y/n): ";
-            cin >> input;
-            if (input == "y") {
-                cout << "Enter new first name: ";
-                cin >> fname;
-            }
-
-            cout << "Change last name? (y/n): ";
-            cin >> input;
-            if (input == "y") {
-                cout << "Enter new last name: ";
-                cin >> lname;
-            }
-
-            cout << "Change phone? (y/n): ";
-            cin >> input;
-            if (input == "y") {
-                cout << "Enter new phone: ";
-                cin >> phone;
-            }
-
-            cout << "Change username? (y/n): ";
-            cin >> input;
-            if (input == "y") {
-                cout << "Enter new username: ";
-                cin >> storedUser;
-            }
-
-            cout << "Change password? (y/n): ";
-            cin >> input;
-            if (input == "y") {
-                cout << "Enter new password: ";
-                cin >> storedPass;
-            }
-
-            cout << "Change email? (y/n): ";
-            cin >> input;
-            if (input == "y") {
-                cout << "Enter new email: ";
-                cin >> email;
-            }
-
-            cout << "\n Student data updated.\n";
-        }
-
-        outfile << id << "," << fname << "," << lname << "," << phone << ","
-            << storedUser << "," << storedPass << "," << email << endl;
-    }
-
-    outfile.close();
-
-    if (!found) {
-        cout << "\n Username not found.\n";
-    }
-
-    system("pause");
-}
+//Anas-Nabil
 float Admin::calculateGPA(int total) {
     if (total >= 90) return 4.0;
     if (total >= 80) return 3.0;
@@ -507,3 +562,4 @@ void Admin::manageStudentGrades() {
     cout << "\n Grades saved for " << selectedSubject << " (Student: " << targetID << ")\n";
     system("pause");
 }
+

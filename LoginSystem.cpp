@@ -1,3 +1,5 @@
+// Anas
+
 #include "LoginSystem.h"
 #include "UserManager.h"
 #include "Student.h"
@@ -8,9 +10,11 @@
 #include <string>
 using namespace std;
 
-void LoginSystem::displayMenu() {
+void LoginSystem::displayMenu()
+{
     UserManager user;
-    while (true) {
+    while (true)
+    {
         system("cls");
         cout << "***********************************************************************\n\n";
         cout << "                      Welcome to Login Page                            \n\n";
@@ -20,34 +24,40 @@ void LoginSystem::displayMenu() {
         cout << "3. FORGOT PASSWORD ?? " << endl;
         cout << "4. EXIT" << endl;
 
-        while (true) {
+        while (true)
+        {
             cout << "\nEnter your choice: ";
             string inputStr;
             int choice;
 
-            while (true) {
+            while (true)
+            {
                 cout << "Enter your choice: ";
-                getline(cin, inputStr);  
+                getline(cin, inputStr);
 
                 bool isNumber = true;
-                for (char ch : inputStr) {
-                    if (!isdigit(ch)) {
+                for (char ch : inputStr)
+                {
+                    if (!isdigit(ch))
+                    {
                         isNumber = false;
                         break;
                     }
                 }
 
-                if (isNumber && !inputStr.empty()) {
-                    choice = stoi(inputStr);  
+                if (isNumber && !inputStr.empty())
+                {
+                    choice = stoi(inputStr);
                     break;
                 }
-                else {
+                else
+                {
                     cout << "\nInvalid input. Please enter a valid number.\n";
                 }
             }
 
-
-            switch (choice) {
+            switch (choice)
+            {
             case 1:
                 user.login();
                 break;
