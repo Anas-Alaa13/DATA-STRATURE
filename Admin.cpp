@@ -518,8 +518,8 @@ void Admin::manageStudentGrades() {
     }
     int quiz, assignment, midterm, practical, finalExam, total = 0;
     do {
-        cout << "\nEnter Quiz (0-10): ";
-        while (!(cin >> quiz) || quiz < 0 || quiz > 10) { cin.clear(); cin.ignore(1000, '\n'); cout << "Try again: "; }
+        cout << "\nEnter Quiz (0-5): ";
+        while (!(cin >> quiz) || quiz < 0 || quiz > 5) { cin.clear(); cin.ignore(1000, '\n'); cout << "Try again: "; }
 
         cout << "Enter Assignment (0-10): ";
         while (!(cin >> assignment) || assignment < 0 || assignment > 10) { cin.clear(); cin.ignore(1000, '\n'); cout << "Try again: "; }
@@ -530,8 +530,8 @@ void Admin::manageStudentGrades() {
         cout << "Enter Practical (0-20): ";
         while (!(cin >> practical) || practical < 0 || practical > 20) { cin.clear(); cin.ignore(1000, '\n'); cout << "Try again: "; }
 
-        cout << "Enter Final (0-60): ";
-        while (!(cin >> finalExam) || finalExam < 0 || finalExam > 60) { cin.clear(); cin.ignore(1000, '\n'); cout << "Try again: "; }
+        cout << "Enter Final (0-50): ";
+        while (!(cin >> finalExam) || finalExam < 0 || finalExam > 50) { cin.clear(); cin.ignore(1000, '\n'); cout << "Try again: "; }
 
         total = quiz + assignment + midterm + practical + finalExam;
         if (total > 100) cout << " Total exceeds 100. Try again.\n";
