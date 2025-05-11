@@ -1,14 +1,16 @@
-// Anas
+                                    //Anas
+
 
 #ifndef USERMANAGER_H
 #define USERMANAGER_H
-class UserManager
-{
+
+#include "DataManager.h"
+
+class UserManager {
 public:
-public:
-    void login();
-    void registerUser();
-    void forgot();
+    void login(DataManager& dm);
+    void registerUser(DataManager& dm);
+    void forgot(DataManager& dm);
 };
 
 #endif

@@ -1,17 +1,15 @@
 ﻿#include "Admin.h"
-# include <map>
+#include <map>
 #include <iostream>
-#include <fstream>
 #include <string>
-#include<vector>
-#include "Course.h"
+#include <vector>
 #include <sstream>
-#include "LoginSystem.h"
-
+#include <algorithm>
 
 using namespace std;
-Admin::Admin() {
-}
+
+Admin::Admin(DataManager& dm) : dm(dm) {}
+
 
 //Anas
 void Admin::displayMenu() {
@@ -22,394 +20,266 @@ void Admin::displayMenu() {
         cout << "                      Welcome Yaaa Admin                            \n\n";
         cout << "*******************        MENU        *******************************\n\n";
         cout << "1. UploadCourse " << endl;
-        cout << "2. Set Prerequistes" << endl;     
+        cout << "2. Set Prerequisites" << endl;
         cout << "3. Edit Student Data " << endl;
         cout << "4. Manage Student Grade " << endl;
         cout << "5. Delete user " << endl;
         cout << "6. EXIT" << endl;
 
+        string inputStr;
         while (true) {
-            cout << "\nEnter your choice: ";
-            string inputStr;
-            int choice;
-
-            while (true) {
-                cout << "Enter your choice: ";
-                getline(cin, inputStr);
-
-                bool isNumber = true;
-                for (char ch : inputStr) {
-                    if (!isdigit(ch)) {
-                        isNumber = false;
-                        break;
-                    }
-                }
-
-                if (isNumber && !inputStr.empty()) {
-                    choice = stoi(inputStr);
+            cout << "Enter your choice: ";
+            getline(cin, inputStr);
+            bool isNumber = true;
+            for (char ch : inputStr) {
+                if (!isdigit(ch)) {
+                    isNumber = false;
                     break;
                 }
-                else {
-                    cout << "\nInvalid input. Please enter a valid number.\n";
-                }
             }
-
-
-            switch (choice) {
-            case 1:
-                uploadCourse("courses.csv");
+            if (isNumber && !inputStr.empty()) {
+                choice = stoi(inputStr);
                 break;
-            case 2:
-                Set_Prerequistes();
-                break;
-            case 3:
-                editStudentData();
-                break;
-            case 4:
-                manageStudentGrades();
-                break; 
-            case 5:
-                deleteUser();
-                    break;
-            case 6:
-                cout << "Salaaaam Yaaa Admin.\n";
-                LoginSystem l;
-              l.displayMenu() ;
-            default:
-                cout << "Invalid choice, please try again.\n";
-                continue;
             }
+            else {
+                cout << "\nInvalid input. Please enter a valid number.\n";
+            }
+        }
+
+        switch (choice) {
+        case 1:
+            UploadCourse();
             break;
+        case 2:
+            SetPrerequisites();
+            break;
+        case 3:
+            editStudentData();
+            break;
+        case 4:
+            manageStudentGrades();
+            break;
+        case 5:
+            deleteUser();
+            break;
+        case 6:
+            cout << "Salaaaam Yaaa Admin.\n";
+            return;
+        default:
+            cout << "Invalid choice, please try again.\n";
         }
     }
 }
 void Admin::deleteUser() {
-    ifstream dbFile("database.csv");
-    if (!dbFile.is_open()) {
-        cout << "Error: Could not open database.csv.\n";
-        system("pause");
-        return;
-    }
-
-    map<string, string> userMap;
-    vector<string> allLines; 
-    string line;
     cout << "\nList of Users:\n";
     cout << "-----------------------------------\n";
-
-    while (getline(dbFile, line)) {
-        allLines.push_back(line);
-        stringstream ss(line);
-        string id, firstName, lastName, phone, username, password, email;
-        getline(ss, id, ',');
-        getline(ss, firstName, ',');
-        getline(ss, lastName, ',');
-        getline(ss, phone, ',');
-        getline(ss, username, ',');
-        getline(ss, password, ',');
-        getline(ss, email, ',');
-
-        userMap[id] = username;
-        cout << "ID: " << id << " | Username: " << username << " | Name: " << firstName << " " << lastName << "\n";
+    for (const auto& user : dm.users) {
+        cout << "ID: " << user.ID << " | Username: " << user.Username << " | Name: " << user.FirstName << " " << user.LastName << "\n";
     }
-    dbFile.close();
-
-    if (userMap.empty()) {
-        cout << "No users found in the database.\n";
-        system("pause");
-        return;
-    }
-
     cout << "-----------------------------------\n";
     cout << "Enter the ID of the user you want to delete: ";
     string targetID;
     cin >> targetID;
 
-    if (userMap.find(targetID) == userMap.end()) {
+    int id = stoi(targetID);
+    auto it = find_if(dm.users.begin(), dm.users.end(), [id](const User& u) { return u.ID == id; });
+    if (it != dm.users.end()) {
+        dm.users.erase(it);
+        cout << "User removed from users list.\n";
+
+        dm.registrations.erase(id);
+        cout << "User removed from registrations.\n";
+
+        dm.grades.erase(remove_if(dm.grades.begin(), dm.grades.end(), [id](const Grade& g) { return g.ID == id; }), dm.grades.end());
+        cout << "User removed from grades.\n";
+
+        cout << "User deletion process completed.\n";
+    }
+    else {
         cout << "Invalid ID. No user found with the given ID.\n";
-        system("pause");
-        return;
     }
-
-    {
-        ofstream dbFileOut("database.csv", ios::trunc); 
-        for (const auto& l : allLines) {
-            if (l.find(targetID + ",") != 0) {
-                dbFileOut << l << "\n";
-            }
-        }
-        dbFileOut.close();
-    }
-    cout << "User removed from database.csv.\n";
-
-    {
-        ifstream regFile("registrations.csv");
-        if (!regFile.is_open()) {
-            cout << "Error: Could not open registrations.csv.\n";
-            system("pause");
-            return;
-        }
-
-        vector<string> regLines;
-        while (getline(regFile, line)) {
-            if (line.find(targetID + ",") != 0) {
-                regLines.push_back(line);
-            }
-        }
-        regFile.close();
-
-        ofstream regFileOut("registrations.csv", ios::trunc);
-        for (const auto& l : regLines) {
-            regFileOut << l << "\n";
-        }
-        regFileOut.close();
-    }
-    cout << "User removed from registrations.csv.\n";
-
-    {
-        ifstream gradesFile("grades.csv");
-        if (!gradesFile.is_open()) {
-            cout << "Error: Could not open grades.csv.\n";
-            system("pause");
-            return;
-        }
-
-        vector<string> gradeLines;
-        while (getline(gradesFile, line)) {
-            if (line.find(targetID + ",") != 0) {
-                gradeLines.push_back(line);
-            }
-        }
-        gradesFile.close();
-
-        ofstream gradesFileOut("grades.csv", ios::trunc);
-        for (const auto& l : gradeLines) {
-            gradesFileOut << l << "\n";
-        }
-        gradesFileOut.close();
-    }
-    cout << "User removed from grades.csv.\n";
-
-    cout << "User deletion process completed.\n";
     system("pause");
-}
-
-
-
-//Abdallah
-void Admin::uploadCourse(const string& filename) {
-    string title, syllabus, instructor;
-    string creditHours;
-
-    cout << "Enter course title: ";
-    getline(cin, title);
-    cout << "Enter syllabus: ";
-    getline(cin, syllabus);
-    cout << "Enter credit hours: ";
-    cin >> creditHours;
-    getline(cin, creditHours);
-    cout << "Enter instructor name: ";
-    getline(cin, instructor);
-
-    Course newCourse(title, syllabus, creditHours, instructor);
-    newCourse.saveToFile(filename);
 }
 void Admin::editStudentData() {
     system("cls");
     cout << "=== Edit Student Data ===\n";
 
-    map<string, vector<string>> students; // المفتاح هو اسم المستخدم، والقيمة هي بيانات الطالب
-    vector<string> headers = { "ID", "First Name", "Last Name", "Phone", "Username", "Password", "Email" };
-
-    ifstream infile("database.csv");
-    string line;
-
     cout << "\nList of all students:\n";
     cout << "------------------------\n";
-
-    while (getline(infile, line)) {
-        stringstream ss(line);
-        vector<string> studentData;
-        string field;
-
-        while (getline(ss, field, ',')) {
-            studentData.push_back(field);
-        }
-
-        if (studentData.size() == headers.size()) {
-            students[studentData[4]] = studentData; 
-            cout << "- Username: " << studentData[4] << " | Name: " << studentData[1] << " " << studentData[2] << " | ID: " << studentData[0] << endl;
+    for (const auto& user : dm.users) {
+        if (user.Username != "admin") {
+            cout << "- Username: " << user.Username << " | Name: " << user.FirstName << " " << user.LastName << " | ID: " << user.ID << endl;
         }
     }
-    infile.close();
 
     string targetUsername;
     cout << "\nEnter the username of the student you want to edit: ";
     cin >> targetUsername;
 
-    auto it = students.find(targetUsername);
-    if (it != students.end()) {
-        vector<string>& studentData = it->second;
-
+    auto it = find_if(dm.users.begin(), dm.users.end(), [&targetUsername](const User& u) { return u.Username == targetUsername; });
+    if (it != dm.users.end()) {
+        User& student = *it;
         cout << "\nStudent found!\n";
-        for (size_t i = 0; i < headers.size(); ++i) {
-            cout << headers[i] << ": " << studentData[i] << "\n";
-        }
+        cout << "ID: " << student.ID << "\n";
+        cout << "First Name: " << student.FirstName << "\n";
+        cout << "Last Name: " << student.LastName << "\n";
+        cout << "Phone: " << student.PhoneNumber << "\n";
+        cout << "Username: " << student.Username << "\n";
+        cout << "Password: " << student.Password << "\n";
+        cout << "Email: " << student.Email << "\n";
 
         string input;
-        for (size_t i = 0; i < headers.size(); ++i) {
-            cout << "\nChange " << headers[i] << "? (y/n): ";
-            cin >> input;
-            if (input == "y") {
-                cout << "Enter new " << headers[i] << ": ";
-                cin >> studentData[i];
-            }
+        cout << "\nChange ID? (y/n): ";
+        cin >> input;
+        if (input == "y") {
+            cout << "Enter new ID: ";
+            cin >> student.ID;
+        }
+        cout << "Change First Name? (y/n): ";
+        cin >> input;
+        if (input == "y") {
+            cout << "Enter new First Name: ";
+            cin >> student.FirstName;
+        }
+        cout << "Change Last Name? (y/n): ";
+        cin >> input;
+        if (input == "y") {
+            cout << "Enter new Last Name: ";
+            cin >> student.LastName;
+        }
+        cout << "Change Phone? (y/n): ";
+        cin >> input;
+        if (input == "y") {
+            cout << "Enter new Phone: ";
+            cin >> student.PhoneNumber;
+        }
+        cout << "Change Username? (y/n): ";
+        cin >> input;
+        if (input == "y") {
+            cout << "Enter new Username: ";
+            cin >> student.Username;
+        }
+        cout << "Change Password? (y/n): ";
+        cin >> input;
+        if (input == "y") {
+            cout << "Enter new Password: ";
+            cin >> student.Password;
+        }
+        cout << "Change Email? (y/n): ";
+        cin >> input;
+        if (input == "y") {
+            cout << "Enter new Email: ";
+            cin >> student.Email;
         }
 
         cout << "\nStudent data updated.\n";
-        ofstream outfile("database.csv");
-        for (const auto& pair : students) {
-            const string& username = pair.first;
-            const vector<string>& data = pair.second;
-
-            for (size_t i = 0; i < data.size(); ++i) {
-                outfile << data[i];
-
-                if (i < data.size() - 1) outfile << ",";
-            }
-            outfile << "\n";
-        }
-
-        outfile.close();
     }
     else {
         cout << "\nUsername not found.\n";
     }
-
     system("pause");
 }
 
 
-//Ahmed
-void Admin::Set_Prerequistes() {
-    ifstream inFile("courses.csv");
-    if (!inFile.is_open()) {
-        cout << "Failed to open courses file.\n";
-        return;
+//Framawy-Ahmed
+void Admin::ShowCourses() {
+    cout << "\nCurrent Courses List:\n---------------------------------------\n";
+    int i = 1;
+    for (const auto& course : dm.courses) {
+        cout << i++ << ". Title: " << course.title << " | Syllabus: " << course.syllabus
+            << " | Credit Hours: " << course.creditHours << " | Instructor: " << course.instructor
+            << " | Prerequisites: " << course.prerequisites << endl;
     }
-
-    ofstream tempFile("temp.csv");
-    if (!tempFile.is_open()) {
-        cout << "Failed to create temp file.\n";
-        return;
+    cout << "---------------------------------------\n";
+}
+bool Admin::isValidPrerequisites(const string& prereqList) {
+    stringstream ss(prereqList);
+    string prereq;
+    while (getline(ss, prereq, ',')) {
+        prereq.erase(remove_if(prereq.begin(), prereq.end(), ::isspace), prereq.end());
+        bool found = false;
+        for (size_t i = 0; i < dm.courses.size(); ++i) {
+            const auto& course = dm.courses[i];
+            if (course.title == prereq) {
+                found = true;
+                break;
+            }
+        }
+        if (!found && !prereq.empty()) {
+            cout << "Warning: prerequisite '" << prereq << "' is not a valid course title.\n";
+            return false;
+        }
     }
+    return true;
+}
+void Admin::UpdatePrerequisites() {
+    string answer;
+    do {
+        string courseToUpdate;
+        cout << "Enter title of the course to update prerequisites for: ";
+        getline(cin, courseToUpdate);
 
-    string line;
-    getline(inFile, line); 
-    tempFile << "Course_title,syllabus,creditHours,instructor,prerequisites\n";
-
-    vector<string> updatedCourses;
-    bool updatedAny = false;
-
-    cout << "\n Current Courses List:\n";
-    cout << "-----------------------------------------------------------\n";
-
-    vector<string> allLines;
-    vector<string> courseTitles;
-
-    while (getline(inFile, line)) {
-        allLines.push_back(line);
-
-        size_t pos1 = line.find(',');
-        size_t pos2 = line.find(',', pos1 + 1);
-        size_t pos3 = line.find(',', pos2 + 1);
-        size_t pos4 = line.find(',', pos3 + 1);
-
-        string t = line.substr(0, pos1);
-        string s = line.substr(pos1 + 1, pos2 - pos1 - 1);
-        string chStr = line.substr(pos2 + 1, pos3 - pos2 - 1);
-        string i = line.substr(pos3 + 1, pos4 - pos3 - 1);
-        string p = line.substr(pos4 + 1);
-
-        courseTitles.push_back(t);
-        cout << " Title: " << t << " | Credit Hours: " << chStr << " | Instructor: " << i << "\n";
-    }
-
-    cout << "-----------------------------------------------------------\n";
-    cout << "\n";
-
-    inFile.clear();
-    inFile.seekg(0);
-    getline(inFile, line); 
-
-    size_t idx = 0;
-    while (getline(inFile, line)) {
-        size_t pos1 = line.find(',');
-        size_t pos2 = line.find(',', pos1 + 1);
-        size_t pos3 = line.find(',', pos2 + 1);
-        size_t pos4 = line.find(',', pos3 + 1);
-
-        string t = line.substr(0, pos1);
-        string s = line.substr(pos1 + 1, pos2 - pos1 - 1);
-        string chStr = line.substr(pos2 + 1, pos3 - pos2 - 1);
-        string i = line.substr(pos3 + 1, pos4 - pos3 - 1);
-        string p = line.substr(pos4 + 1);
-
-        cout << "\nCourse [" << idx + 1 << "/" << courseTitles.size() << "] - " << t << "\n";
-        cout << "Do you want to set/change prerequisites? (y = yes, n = no, x = cancel all): ";
-        string choice;
-        getline(cin, choice);
-
-        if (choice == "x" || choice == "X") {
-            cout << "\n Operation canceled by user.\n";
-            inFile.close();
-            tempFile.close();
-            remove("temp.csv");
+        auto it = find_if(dm.courses.begin(), dm.courses.end(), [&courseToUpdate](const Course& c) { return c.title == courseToUpdate; });
+        if (it == dm.courses.end()) {
+            cout << "Warning: Course title '" << courseToUpdate << "' is not a valid course title.\n";
             return;
         }
 
-        if (choice == "y" || choice == "Y") {
-            cout << "Enter new prerequisites: ";
-            getline(cin, p);
-            updatedCourses.push_back(t);
-            updatedAny = true;
+        cout << "Enter new prerequisites (comma separated, leave empty for none): ";
+        string newPrereq;
+        getline(cin, newPrereq);
+        if (isValidPrerequisites(newPrereq)) {
+            it->prerequisites = newPrereq;
+            cout << "Prerequisites updated for " << courseToUpdate << ".\n";
+        }
+        else {
+            cout << "Invalid prerequisites for " << courseToUpdate << ".\n";
         }
 
-        tempFile << t << "," << s << "," << chStr << "," << i << "," << p << "\n";
-        idx++;
+        cout << "Do you want to update prerequisites for another course? (Y = Yes, N = No): ";
+        getline(cin, answer);
+    } while (answer == "Y" || answer == "y");
+}
+void Admin::UploadCourse() {
+    Course newCourse;
+    cout << "\n--- Add New Course ---\n";
+    cout << "Enter course title: ";
+    getline(cin, newCourse.title);
+    for (const auto& course : dm.courses) {
+        if (course.title == newCourse.title) {
+            cout << "Error: Course with title '" << newCourse.title << "' already exists.\n";
+            system("pause");
+            return;
+        }
     }
+    cout << "Enter syllabus: ";
+    getline(cin, newCourse.syllabus);
+    cout << "Enter credit hours: ";
+    getline(cin, newCourse.creditHours);
+    cout << "Enter instructor name: ";
+    getline(cin, newCourse.instructor);
+    cout << "Enter prerequisites (comma separated, leave empty for none): ";
+    getline(cin, newCourse.prerequisites);
 
-    inFile.close();
-    tempFile.close();
-
-    if (!updatedAny) {
-        cout << "\nNo changes made. Operation ended.\n";
-        remove("temp.csv");
-        return;
-    }
-
-    cout << "\n You updated prerequisites for:\n";
-    for (const string& course : updatedCourses) {
-        cout << "Done " << course << "\n";
-    }
-
-    cout << "\n Confirm saving changes? (y/n): ";
-    string confirm;
-    getline(cin, confirm);
-
-    if (confirm == "y" || confirm == "Y") {
-        remove("courses.csv");
-        rename("temp.csv", "courses.csv");
-        cout << "\n Changes saved successfully!\n";
+    if (isValidPrerequisites(newCourse.prerequisites)) {
+        dm.courses.push_back(newCourse);
+        cout << "New course added successfully!\n";
     }
     else {
-        remove("temp.csv");
-        cout << "\n Changes discarded.\n";
+        cout << "Invalid prerequisites. Course not added.\n";
     }
+    system("pause");
+}
+void Admin::SetPrerequisites() {
+    system("cls");
+    ShowCourses();
+    UpdatePrerequisites();
+    system("pause");
 }
 
 
-//Anas-Nabil
+
+//Nabil
 float Admin::calculateGPA(int total) {
     if (total >= 90) return 4.0;
     if (total >= 80) return 3.0;
@@ -421,68 +291,32 @@ void Admin::manageStudentGrades() {
     system("cls");
     cout << "=== Manage Student Grades ===\n";
 
-    ifstream infile("registrations.csv");
-    if (!infile) {
-        cout << " Could not open registrations.csv\n";
-        return;
-    }
-
-    string headerLine;
-    getline(infile, headerLine);
-    vector<string> headers;
-    stringstream hs(headerLine);
-    string col;
-    while (getline(hs, col, ',')) headers.push_back(col);
-
-    vector<string> ids;
-    map<string, vector<string>> studentSubjects;
-    string line;
-    while (getline(infile, line)) {
-        stringstream ss(line);
-        string id;
-        getline(ss, id, ',');
-        ids.push_back(id);
-
-        vector<string> subjects;
-        string subject;
-        while (getline(ss, subject, ',')) {
-            if (!subject.empty()) subjects.push_back(subject);
-        }
-
-        studentSubjects[id] = subjects;
-    }
-    infile.close();
-
     cout << "\nList of Students (IDs):\n";
-    for (const string& id : ids) cout << "- " << id << endl;
+    for (const auto& user : dm.users) {
+        if (user.Username != "admin") {
+            cout << "- " << user.ID << endl;
+        }
+    }
 
     string targetID;
     cout << "\nEnter student ID to enter grades for: ";
     cin >> targetID;
 
-    if (studentSubjects.find(targetID) == studentSubjects.end()) {
+    int id = stoi(targetID);
+    auto it = find_if(dm.users.begin(), dm.users.end(), [id](const User& u) { return u.ID == id; });
+    if (it == dm.users.end()) {
         cout << "\n ID not found!\n";
         system("pause");
         return;
     }
 
-    map<string, map<string, string>> existingGrades;
-    vector<string> allGrades; 
-    ifstream gradesIn("grades.csv");
-    string gradeHeader;
-    if (gradesIn) {
-        getline(gradesIn, gradeHeader); 
-        while (getline(gradesIn, line)) {
-            allGrades.push_back(line);
-            stringstream ss(line);
-            string id, subject;
-            getline(ss, id, ',');
-            getline(ss, subject, ',');
-            existingGrades[id][subject] = line;
-        }
-        gradesIn.close();
+    vector<string> subjects = dm.registrations[id];
+    if (subjects.empty()) {
+        cout << "No subjects registered for this student.\n";
+        system("pause");
+        return;
     }
-    vector<string> subjects = studentSubjects[targetID];
+
     cout << "\n Subjects registered for student " << targetID << ":\n";
     for (const string& subj : subjects) cout << "- " << subj << endl;
 
@@ -491,21 +325,17 @@ void Admin::manageStudentGrades() {
     cout << "\nEnter subject name to enter grades for: ";
     getline(cin, selectedSubject);
 
-    bool valid = false;
-    for (const string& subj : subjects) {
-        if (subj == selectedSubject) {
-            valid = true;
-            break;
-        }
-    }
-
-    if (!valid) {
+    if (find(subjects.begin(), subjects.end(), selectedSubject) == subjects.end()) {
         cout << "❌ Invalid subject for this student.\n";
         system("pause");
         return;
     }
 
-    if (existingGrades[targetID].count(selectedSubject)) {
+    auto gradeIt = find_if(dm.grades.begin(), dm.grades.end(), [id, &selectedSubject](const Grade& g) {
+        return g.ID == id && g.Subject == selectedSubject;
+        });
+
+    if (gradeIt != dm.grades.end()) {
         cout << "Grades already exist for this subject.\n";
         cout << "Do you want to overwrite them? (y/n): ";
         char c;
@@ -516,10 +346,11 @@ void Admin::manageStudentGrades() {
             return;
         }
     }
+
     int quiz, assignment, midterm, practical, finalExam, total = 0;
     do {
-        cout << "\nEnter Quiz (0-5): ";
-        while (!(cin >> quiz) || quiz < 0 || quiz > 5) { cin.clear(); cin.ignore(1000, '\n'); cout << "Try again: "; }
+        cout << "\nEnter Quiz (0-10): ";
+        while (!(cin >> quiz) || quiz < 0 || quiz > 10) { cin.clear(); cin.ignore(1000, '\n'); cout << "Try again: "; }
 
         cout << "Enter Assignment (0-10): ";
         while (!(cin >> assignment) || assignment < 0 || assignment > 10) { cin.clear(); cin.ignore(1000, '\n'); cout << "Try again: "; }
@@ -530,36 +361,29 @@ void Admin::manageStudentGrades() {
         cout << "Enter Practical (0-20): ";
         while (!(cin >> practical) || practical < 0 || practical > 20) { cin.clear(); cin.ignore(1000, '\n'); cout << "Try again: "; }
 
-        cout << "Enter Final (0-50): ";
-        while (!(cin >> finalExam) || finalExam < 0 || finalExam > 50) { cin.clear(); cin.ignore(1000, '\n'); cout << "Try again: "; }
+        cout << "Enter Final (0-60): ";
+        while (!(cin >> finalExam) || finalExam < 0 || finalExam > 60) { cin.clear(); cin.ignore(1000, '\n'); cout << "Try again: "; }
 
         total = quiz + assignment + midterm + practical + finalExam;
         if (total > 100) cout << " Total exceeds 100. Try again.\n";
     } while (total > 100);
 
     float gpa = calculateGPA(total);
-    stringstream newline;
-    newline << targetID << "," << selectedSubject << ","
-        << quiz << "," << assignment << "," << midterm << ","
-        << practical << "," << finalExam << "," << total << "," << gpa;
 
-    bool updated = false;
-    for (string& existingLine : allGrades) {
-        if (existingLine.find(targetID + "," + selectedSubject) == 0) {
-            existingLine = newline.str();
-            updated = true;
-            break;
-        }
+    if (gradeIt != dm.grades.end()) {
+        gradeIt->Quiz = quiz;
+        gradeIt->Assignment = assignment;
+        gradeIt->Midterm = midterm;
+        gradeIt->Practical = practical;
+        gradeIt->Final = finalExam;
+        gradeIt->Total = total;
+        gradeIt->GPA = gpa;
     }
-    if (!updated) {
-        allGrades.push_back(newline.str());
+    else {
+        Grade newGrade = { id, selectedSubject, quiz, assignment, midterm, practical, finalExam, total, gpa };
+        dm.grades.push_back(newGrade);
     }
-    ofstream out("grades.csv");
-    out << "ID,Subject,Quiz,Assignment,Midterm,Practical,Final,Total,GPA\n";
-    for (const string& l : allGrades) out << l << "\n";
-    out.close();
 
     cout << "\n Grades saved for " << selectedSubject << " (Student: " << targetID << ")\n";
     system("pause");
 }
-

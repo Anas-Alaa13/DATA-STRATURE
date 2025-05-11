@@ -1,7 +1,9 @@
 #include "LoginSystem.h"
+#include "DataManager.h"
 
 int main() {
-    LoginSystem system;
-    system.displayMenu();
+    DataManager dm;
+    LoginSystem ls(dm);
+    ls.displayMenu();
     return 0;
 }

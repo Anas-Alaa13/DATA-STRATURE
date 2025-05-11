@@ -4,46 +4,45 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "Course.h"
-using namespace std;
+#include <queue>
+#include "DataManager.h"
+#include "Structures.h"
 
 class Student {
 private:
     int studentID;
-    string username;
+    std::string username;
+    DataManager& dm;
 
 public:
-    Student();
+    Student(DataManager& dm);
 
     //Kenzy
-    void setUsername(const string& user);
+    void setUsername(const std::string& user);
+    void setStudentID(int id);
     int getStudentID() const;
-    unordered_map<int, vector<string>> readRegistrationsFile(const string& filename);
-    bool alreadyRegistered(const string& courseName);
-    bool prerequisitesMet(const string& prereq);
+    bool alreadyRegistered(const std::string& courseName);
+    bool prerequisitesMet(const std::string& prereq);
     void registercourse();
-    Course findcourse(const string& searchName);
-	void setStudentID(int id) { studentID = id; }
-    bool isCourseValid(const string& courseName);
+    Course findcourse(const std::string& searchName);
+    bool isCourseValid(const std::string& courseName);
 
 
-    //Mohamed
-    Student(const std::string& uname) : username(uname) {}
-    std::string getUsername() const { return username; }
+	//Mohamed
+    std::string getUsername() const;
     void viewGrades();
     void filterGrades();
-    void exportGradesToCSV();
 
 
-
-    //Anas
+	//Anas
     void displayMenu();
     void viewRegisteredCourses();
 
 
-    //Farah
-    void generateReport(const string& id);
 
+
+   //Frah
+    void generateReport(const std::string& id);
 };
 
 #endif
