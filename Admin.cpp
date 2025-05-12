@@ -22,9 +22,10 @@ void Admin::displayMenu() {
         cout << "1. UploadCourse " << endl;
         cout << "2. Set Prerequisites" << endl;
         cout << "3. Edit Student Data " << endl;
-        cout << "4. Manage Student Grade " << endl;
-        cout << "5. Delete user " << endl;
-        cout << "6. EXIT" << endl;
+        cout << "4. Show Courses " << endl;
+        cout << "5. Manage Student Grade " << endl;
+        cout << "6. Delete user " << endl;
+        cout << "7. EXIT" << endl;
 
         string inputStr;
         while (true) {
@@ -55,14 +56,17 @@ void Admin::displayMenu() {
             break;
         case 3:
             editStudentData();
-            break;
+            break;  
         case 4:
+                ShowCourses();
+                break;
+        case 5:
             manageStudentGrades();
             break;
-        case 5:
+        case 6:
             deleteUser();
             break;
-        case 6:
+        case 7:
             cout << "Salaaaam Yaaa Admin.\n";
             return;
         default:
@@ -240,6 +244,41 @@ void Admin::UpdatePrerequisites() {
         getline(cin, answer);
     } while (answer == "Y" || answer == "y");
 }
+void Admin::SetPrerequisites() {
+    system("cls");
+    cout << "--- Set Course Prerequisites ---\n";
+    ShowCourses(); 
+
+    cout << "Enter the title of the course to set prerequisites: ";
+    string courseTitle;
+    getline(cin, courseTitle);
+
+    bool found = false;
+    for (auto& course : dm.courses) {
+        if (course.title == courseTitle) {
+            found = true;
+            cout << "Enter prerequisites for '" << course.title << "' (comma separated, leave empty for none): ";
+            string prereqs;
+            getline(cin, prereqs);
+
+            if (isValidPrerequisites(prereqs)) {
+                course.prerequisites = prereqs;
+                cout << " Prerequisites updated successfully.\n";
+                dm.writeCourses("courses.csv"); 
+            }
+            else {
+                cout << " Invalid prerequisites. Update failed.\n";
+            }
+            break;
+        }
+    }
+
+    if (!found) {
+        cout << "❌ Course not found.\n";
+    }
+
+    system("pause");
+}
 void Admin::UploadCourse() {
     Course newCourse;
     cout << "\n--- Add New Course ---\n";
@@ -258,24 +297,17 @@ void Admin::UploadCourse() {
     getline(cin, newCourse.creditHours);
     cout << "Enter instructor name: ";
     getline(cin, newCourse.instructor);
-    cout << "Enter prerequisites (comma separated, leave empty for none): ";
-    getline(cin, newCourse.prerequisites);
 
-    if (isValidPrerequisites(newCourse.prerequisites)) {
-        dm.courses.push_back(newCourse);
-        cout << "New course added successfully!\n";
-    }
-    else {
-        cout << "Invalid prerequisites. Course not added.\n";
-    }
+    // Initially, prerequisites are empty
+    newCourse.prerequisites = "";
+
+    dm.courses.push_back(newCourse);
+    cout << "New course added successfully! You can set prerequisites separately.\n";
+
     system("pause");
 }
-void Admin::SetPrerequisites() {
-    system("cls");
-    ShowCourses();
-    UpdatePrerequisites();
-    system("pause");
-}
+
+
 
 
 
