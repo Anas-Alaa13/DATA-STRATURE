@@ -141,7 +141,7 @@ void Student::viewRegisteredCourses() {
 }
 
 
-//Kinzy
+//Kenzy
 bool Student::alreadyRegistered(const string& courseName) {
     auto it = dm.registrations.find(studentID);
     if (it != dm.registrations.end()) {
