@@ -42,7 +42,7 @@ void DataManager::readCourses(const std::string& filename) {
         return;
     }
     std::string line;
-    std::getline(file, line); // Skip header
+    std::getline(file, line); 
     while (std::getline(file, line)) {
         std::stringstream ss(line);
         Course course;
@@ -52,6 +52,8 @@ void DataManager::readCourses(const std::string& filename) {
         std::getline(ss, course.instructor, ',');
         std::getline(ss, course.prerequisites, ',');
         courses.push_back(course);
+        courseTitles.insert(course.title); 
+
     }
     file.close();
 }

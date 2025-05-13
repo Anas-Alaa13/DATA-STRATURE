@@ -5,6 +5,9 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
+#include <unordered_set>
+#include <sstream>
+#include <algorithm>
 
 using namespace std;
 
@@ -186,94 +189,69 @@ void Admin::editStudentData() {
 
 
 //Framawy-Ahmed
+
 void Admin::ShowCourses() {
     cout << "\nCurrent Courses List:\n---------------------------------------\n";
+
+    vector<pair<int, string>> indexToTitle;
+
     int i = 1;
     for (const auto& course : dm.courses) {
-        cout << i++ << ". Title: " << course.title << " | Syllabus: " << course.syllabus
-            << " | Credit Hours: " << course.creditHours << " | Instructor: " << course.instructor
+        indexToTitle.emplace_back(i, course.title);
+        cout << i++ << ". Title: " << course.title
+            << " | Syllabus: " << course.syllabus
+            << " | Credit Hours: " << course.creditHours
+            << " | Instructor: " << course.instructor
             << " | Prerequisites: " << course.prerequisites << endl;
     }
+
     cout << "---------------------------------------\n";
+
 }
 bool Admin::isValidPrerequisites(const string& prereqList) {
+    unordered_set<string> courseTitles;
+    for (const auto& course : dm.courses)
+        courseTitles.insert(course.title);
+
     stringstream ss(prereqList);
     string prereq;
+
     while (getline(ss, prereq, ',')) {
         prereq.erase(remove_if(prereq.begin(), prereq.end(), ::isspace), prereq.end());
-        bool found = false;
-        for (size_t i = 0; i < dm.courses.size(); ++i) {
-            const auto& course = dm.courses[i];
-            if (course.title == prereq) {
-                found = true;
-                break;
-            }
-        }
-        if (!found && !prereq.empty()) {
+        if (!prereq.empty() && courseTitles.find(prereq) == courseTitles.end()) {
             cout << "Warning: prerequisite '" << prereq << "' is not a valid course title.\n";
             return false;
         }
     }
     return true;
 }
-void Admin::UpdatePrerequisites() {
-    string answer;
-    do {
-        string courseToUpdate;
-        cout << "Enter title of the course to update prerequisites for: ";
-        getline(cin, courseToUpdate);
-
-        auto it = find_if(dm.courses.begin(), dm.courses.end(), [&courseToUpdate](const Course& c) { return c.title == courseToUpdate; });
-        if (it == dm.courses.end()) {
-            cout << "Warning: Course title '" << courseToUpdate << "' is not a valid course title.\n";
-            return;
-        }
-
-        cout << "Enter new prerequisites (comma separated, leave empty for none): ";
-        string newPrereq;
-        getline(cin, newPrereq);
-        if (isValidPrerequisites(newPrereq)) {
-            it->prerequisites = newPrereq;
-            cout << "Prerequisites updated for " << courseToUpdate << ".\n";
-        }
-        else {
-            cout << "Invalid prerequisites for " << courseToUpdate << ".\n";
-        }
-
-        cout << "Do you want to update prerequisites for another course? (Y = Yes, N = No): ";
-        getline(cin, answer);
-    } while (answer == "Y" || answer == "y");
-}
 void Admin::SetPrerequisites() {
     system("cls");
     cout << "--- Set Course Prerequisites ---\n";
-    ShowCourses(); 
+    ShowCourses();
 
     cout << "Enter the title of the course to set prerequisites: ";
     string courseTitle;
     getline(cin, courseTitle);
 
-    bool found = false;
-    for (auto& course : dm.courses) {
-        if (course.title == courseTitle) {
-            found = true;
-            cout << "Enter prerequisites for '" << course.title << "' (comma separated, leave empty for none): ";
-            string prereqs;
-            getline(cin, prereqs);
+    auto it = find_if(dm.courses.begin(), dm.courses.end(),
+        [&courseTitle](const Course& c) { return c.title == courseTitle; });
 
-            if (isValidPrerequisites(prereqs)) {
-                course.prerequisites = prereqs;
-                cout << " Prerequisites updated successfully.\n";
-                dm.writeCourses("courses.csv"); 
-            }
-            else {
-                cout << " Invalid prerequisites. Update failed.\n";
-            }
-            break;
+    if (it != dm.courses.end()) {
+        cout << "Enter prerequisites for '" << it->title << "' (comma separated, leave empty for none): ";
+        string prereqs;
+        getline(cin, prereqs);
+
+        if (isValidPrerequisites(prereqs)) {
+            it->prerequisites = prereqs;
+            cout << "Prerequisites updated successfully.\n";
+            dm.writeCourses("courses.csv");
+        }
+        else {
+            cout << "Invalid prerequisites. Update failed.\n";
         }
     }
-
-    if (!found) {
+    else {
         cout << "❌ Course not found.\n";
     }
 
@@ -284,13 +262,14 @@ void Admin::UploadCourse() {
     cout << "\n--- Add New Course ---\n";
     cout << "Enter course title: ";
     getline(cin, newCourse.title);
-    for (const auto& course : dm.courses) {
-        if (course.title == newCourse.title) {
-            cout << "Error: Course with title '" << newCourse.title << "' already exists.\n";
-            system("pause");
-            return;
-        }
+
+    // نستخدم set للتحقق من وجود العنوان
+    if (dm.courseTitles.find(newCourse.title) != dm.courseTitles.end()) {
+        cout << "Error: Course with title '" << newCourse.title << "' already exists.\n";
+        system("pause");
+        return;
     }
+
     cout << "Enter syllabus: ";
     getline(cin, newCourse.syllabus);
     cout << "Enter credit hours: ";
@@ -298,15 +277,14 @@ void Admin::UploadCourse() {
     cout << "Enter instructor name: ";
     getline(cin, newCourse.instructor);
 
-    // Initially, prerequisites are empty
     newCourse.prerequisites = "";
 
     dm.courses.push_back(newCourse);
-    cout << "New course added successfully! You can set prerequisites separately.\n";
+    dm.courseTitles.insert(newCourse.title); 
 
+    cout << "New course added successfully! You can set prerequisites separately.\n";
     system("pause");
 }
-
 
 
 
@@ -319,6 +297,7 @@ float Admin::calculateGPA(int total) {
     if (total >= 60) return 1.0;
     return 0.0;
 }
+
 void Admin::manageStudentGrades() {
     system("cls");
     cout << "=== Manage Student Grades ===\n";

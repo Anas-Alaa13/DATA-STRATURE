@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 #include "Structures.h"
+#include<set>
+
 #ifndef DATAMANAGER_H
 #define DATAMANAGER_H
 
@@ -12,6 +14,7 @@ class DataManager {
 public:
     std::vector<User> users;
     std::vector<Course> courses;
+    std::set<std::string> courseTitles;
     std::map<int, std::vector<std::string>> registrations;
     std::vector<Grade> grades;
 
