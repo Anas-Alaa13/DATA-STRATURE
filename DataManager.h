@@ -8,25 +8,25 @@
 
 #ifndef DATAMANAGER_H
 #define DATAMANAGER_H
-
+using namespace std;
 
 class DataManager {
 public:
-    std::vector<User> users;
-    std::vector<Course> courses;
-    std::set<std::string> courseTitles;
-    std::map<int, std::vector<std::string>> registrations;
-    std::vector<Grade> grades;
+     vector<User> users;
+     vector<Course> courses;
+     set< string> courseTitles;
+     map<int,  vector< string>> registrations;
+     vector<Grade> grades;
 
     DataManager();
-    void readUsers(const std::string& filename);
-    void readCourses(const std::string& filename);
-    void readRegistrations(const std::string& filename);
-    void readGrades(const std::string& filename);
-    void writeUsers(const std::string& filename);
-    void writeCourses(const std::string& filename);
-    void writeRegistrations(const std::string& filename);
-    void writeGrades(const std::string& filename);
+    void readUsers(const  string& filename);
+    void readCourses(const  string& filename);
+    void readRegistrations(const  string& filename);
+    void readGrades(const  string& filename);
+    void writeUsers(const  string& filename);
+    void writeCourses(const  string& filename);
+    void writeRegistrations(const  string& filename);
+    void writeGrades(const  string& filename);
     void saveAllData();
 };
 

@@ -26,6 +26,14 @@ void LoginSystem::displayMenu() {
         cout << "Enter your choice: ";
         cin >> choice;
 
+        if (cin.fail()) {
+            cin.clear(); 
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input. Please enter a number.\n";
+            system("pause"); 
+            continue;
+        }
+
         switch (choice) {
         case 1:
             user.login(dm);

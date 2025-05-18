@@ -6,17 +6,11 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include <algorithm>
 #include <unordered_set>
-#include <sstream>
-#include <algorithm>
 #include <queue>  
-#include <map>
-#include <unordered_set>
 #include <stack>
 #include <unordered_map>
 #include <list>
-#include <algorithm>
 
 using namespace std;
 
@@ -80,6 +74,7 @@ void Admin::displayMenu() {
             break;
         case 7:
             cout << "Salaaaam Yaaa Admin.\n";
+            system("pause");
             return;
         default:
             cout << "Invalid choice, please try again.\n";
@@ -87,173 +82,91 @@ void Admin::displayMenu() {
     }
 }
 void Admin::deleteUser() {
-stack <User> deletedUsers; 
-    cout << "\nList of Users:\n";
-    cout << "-----------------------------------\n";
+    stack<User> deletedUsers;
 
-    map<int, User*> userMap;
-    unordered_set<int> idSet;
+    while (true) {
+        system("cls");
+        cout << "\nList of Users:\n";
+        cout << "-----------------------------------\n";
 
-    for (auto& user : dm.users) {
-        cout << "ID: " << user.ID << " | Username: " << user.Username
-            << " | Name: " << user.FirstName << " " << user.LastName << "\n";
-        userMap[user.ID] = &user;
-        idSet.insert(user.ID);
-    }
+        map<int, User*> userMap;
+        unordered_set<int> idSet;
 
-    cout << "-----------------------------------\n";
-    cout << "Enter the ID of the user you want to delete: ";
-    string targetID;
-    cin >> targetID;
-
-    int id;
-    try {
-        id = stoi(targetID);
-    }
-    catch (...) {
-        cout << " Invalid input. Please enter a valid numeric ID.\n";
-        system("pause");
-        return;
-    }
-
-    if (idSet.find(id) == idSet.end()) {
-        cout << " Invalid ID. No user found with the given ID.\n";
-        system("pause");
-        return;
-    }
-    auto it = find_if(dm.users.begin(), dm.users.end(), [id](const User& u) { return u.ID == id; });
-    if (it != dm.users.end()) {
-        deletedUsers.push(*it);  
-        dm.users.erase(it);
-        cout << " User removed from users list.\n";
-    }
-    if (dm.registrations.erase(id)) {
-        cout << " User removed from registrations.\n";
-    }
-
-    auto before = dm.grades.size();
-    dm.grades.erase(remove_if(dm.grades.begin(), dm.grades.end(),
-        [id](const Grade& g) { return g.ID == id; }), dm.grades.end());
-    if (before != dm.grades.size()) {
-        cout << " User removed from grades.\n";
-    }
-
-    cout << " User deletion process completed.\n";
-
-    cout << "Do you want to undo the deletion? (y/n): ";
-    string choice;
-    cin >> choice;
-    if (choice == "y" || choice == "Y") {
-        if (!deletedUsers.empty()) {
-            dm.users.push_back(deletedUsers.top());  // رجع المستخدم
-            deletedUsers.pop();
-            cout << " Deletion undone. User restored.\n";
+        for (auto& user : dm.users) {
+            cout << "ID: " << user.ID << " | Username: " << user.Username
+                << " | Name: " << user.FirstName << " " << user.LastName << "\n";
+            userMap[user.ID] = &user;
+            idSet.insert(user.ID);
         }
-    }
 
-    system("pause");
-}
-void Admin::editStudentData()  {
-    system("cls");
-    cout << "=== Edit Student Data ===\n";
-    map<string, User*> usernameMap;
-
-    cout << "\nList of all students:\n";
-    cout << "------------------------\n";
-
-    for (auto& user : dm.users) {
-        if (user.Username != "admin") {
-            cout << "- Username: " << user.Username
-                << " | Name: " << user.FirstName << " " << user.LastName
-                << " | ID: " << user.ID << endl;
-
-            usernameMap[user.Username] = &user; 
+        if (dm.users.empty()) {
+            cout << "No users found.\n";
+            system("pause");
+            break;
         }
-    }
 
-    string targetUsername;
-    cout << "\nEnter the username of the student you want to edit: ";
-    cin >> targetUsername;
-
-    auto it = usernameMap.find(targetUsername);
-    if (it != usernameMap.end()) {
-        User* student = it->second;
-        cout << "\nStudent found!\n";
-        cout << "ID: " << student->ID << "\n";
-        cout << "First Name: " << student->FirstName << "\n";
-        cout << "Last Name: " << student->LastName << "\n";
-        cout << "Phone: " << student->PhoneNumber << "\n";
-        cout << "Username: " << student->Username << "\n";
-        cout << "Password: " << student->Password << "\n";
-        cout << "Email: " << student->Email << "\n";
-
+        cout << "-----------------------------------\n";
+        cout << "Enter the ID of the user you want to delete (or type 'exit' to go back): ";
         string input;
-        cout << "\nChange ID? (y/n): ";
         cin >> input;
-        if (input == "y") {
-            cout << "Enter new ID: ";
-            cin >> student->ID;
-        }
-        cout << "Change First Name? (y/n): ";
-        cin >> input;
-        if (input == "y") {
-            cout << "Enter new First Name: ";
-            cin >> student->FirstName;
-        }
-        cout << "Change Last Name? (y/n): ";
-        cin >> input;
-        if (input == "y") {
-            cout << "Enter new Last Name: ";
-            cin >> student->LastName;
-        }
-        cout << "Change Phone? (y/n): ";
-        cin >> input;
-        if (input == "y") {
-            cout << "Enter new Phone: ";
-            cin >> student->PhoneNumber;
+
+        if (input == "exit") {
+            break;
         }
 
-        cout << "Change Username? (y/n): ";
-        cin >> input;
-        if (input == "y") {
-            string newUsername;
-            cout << "Enter new Username: ";
-            cin >> newUsername;
+        int id;
+        try {
+            id = stoi(input);
+        }
+        catch (...) {
+            cout << "Invalid input. Please enter a valid numeric ID.\n";
+            system("pause");
+            continue;
+        }
 
-            set<string> existingUsernames;
-            for (const auto& pair : usernameMap) {
-                if (pair.first != student->Username) {
-                    existingUsernames.insert(pair.first);
-                }
+        if (idSet.find(id) == idSet.end()) {
+            cout << "Invalid ID. No user found with the given ID.\n";
+            system("pause");
+            continue;
+        }
+
+        auto it = find_if(dm.users.begin(), dm.users.end(), [id](const User& u) { return u.ID == id; });
+        if (it != dm.users.end()) {
+            deletedUsers.push(*it);
+            dm.users.erase(it);
+            cout << "User removed from users list.\n";
+        }
+
+        if (dm.registrations.erase(id)) {
+            cout << "User removed from registrations.\n";
+        }
+
+        auto before = dm.grades.size();
+        dm.grades.erase(remove_if(dm.grades.begin(), dm.grades.end(),
+            [id](const Grade& g) { return g.ID == id; }), dm.grades.end());
+        if (before != dm.grades.size()) {
+            cout << "User removed from grades.\n";
+        }
+
+        cout << "User deletion process completed.\n";
+
+        cout << "Do you want to undo the deletion? (y/n): ";
+        string undoChoice;
+        cin >> undoChoice;
+        if (undoChoice == "y" || undoChoice == "Y") {
+            if (!deletedUsers.empty()) {
+                dm.users.push_back(deletedUsers.top());
+                deletedUsers.pop();
+                cout << "Deletion undone. User restored.\n";
             }
-
-            if (existingUsernames.find(newUsername) != existingUsernames.end()) {
-                cout << " Error: Username already exists.\n";
-            }
-            else {
-                student->Username = newUsername;
-                cout << " Username updated.\n";
-            }
         }
 
-        cout << "Change Password? (y/n): ";
-        cin >> input;
-        if (input == "y") {
-            cout << "Enter new Password: ";
-            cin >> student->Password;
+        cout << "\nDo you want to delete another user? (y/n): ";
+        string repeatChoice;
+        cin >> repeatChoice;
+        if (repeatChoice != "y" && repeatChoice != "Y") {
+            break;
         }
-
-        cout << "Change Email? (y/n): ";
-        cin >> input;
-        if (input == "y") {
-            cout << "Enter new Email: ";
-            cin >> student->Email;
-        }
-
-        cout << "\n Student data updated.\n";
-    }
-    else {
-        cout << "\n Username not found.\n";
     }
 
     system("pause");
@@ -360,6 +273,111 @@ void Admin::UploadCourse() {
     dm.courseTitles.insert(newCourse.title); 
 
     cout << "New course added successfully! You can set prerequisites separately.\n";
+    system("pause");
+}
+void Admin::editStudentData()  {
+    system("cls");
+    cout << "=== Edit Student Data ===\n";
+    map<string, User*> usernameMap;
+
+    cout << "\nList of all students:\n";
+    cout << "------------------------\n";
+
+    for (auto& user : dm.users) {
+        if (user.Username != "admin") {
+            cout << "- Username: " << user.Username
+                << " | Name: " << user.FirstName << " " << user.LastName
+                << " | ID: " << user.ID << endl;
+
+            usernameMap[user.Username] = &user; 
+        }
+    }
+
+    string targetUsername;
+    cout << "\nEnter the username of the student you want to edit: ";
+    cin >> targetUsername;
+
+    auto it = usernameMap.find(targetUsername);
+    if (it != usernameMap.end()) {
+        User* student = it->second;
+        cout << "\nStudent found!\n";
+        cout << "ID: " << student->ID << "\n";
+        cout << "First Name: " << student->FirstName << "\n";
+        cout << "Last Name: " << student->LastName << "\n";
+        cout << "Phone: " << student->PhoneNumber << "\n";
+        cout << "Username: " << student->Username << "\n";
+        cout << "Password: " << student->Password << "\n";
+        cout << "Email: " << student->Email << "\n";
+
+        string input;
+        cout << "\nChange ID? (y/n): ";
+        cin >> input;
+        if (input == "y") {
+            cout << "Enter new ID: ";
+            cin >> student->ID;
+        }
+        cout << "Change First Name? (y/n): ";
+        cin >> input;
+        if (input == "y") {
+            cout << "Enter new First Name: ";
+            cin >> student->FirstName;
+        }
+        cout << "Change Last Name? (y/n): ";
+        cin >> input;
+        if (input == "y") {
+            cout << "Enter new Last Name: ";
+            cin >> student->LastName;
+        }
+        cout << "Change Phone? (y/n): ";
+        cin >> input;
+        if (input == "y") {
+            cout << "Enter new Phone: ";
+            cin >> student->PhoneNumber;
+        }
+
+        cout << "Change Username? (y/n): ";
+        cin >> input;
+        if (input == "y") {
+            string newUsername;
+            cout << "Enter new Username: ";
+            cin >> newUsername;
+
+            set<string> existingUsernames;
+            for (const auto& pair : usernameMap) {
+                if (pair.first != student->Username) {
+                    existingUsernames.insert(pair.first);
+                }
+            }
+
+            if (existingUsernames.find(newUsername) != existingUsernames.end()) {
+                cout << " Error: Username already exists.\n";
+            }
+            else {
+                student->Username = newUsername;
+                cout << " Username updated.\n";
+            }
+        }
+
+        cout << "Change Password? (y/n): ";
+        cin >> input;
+        if (input == "y") {
+            cout << "Enter new Password: ";
+            cin >> student->Password;
+        }
+
+        cout << "Change Email? (y/n): ";
+        cin >> input;
+        if (input == "y") {
+            cout << "Enter new Email: ";
+            cin >> student->Email;
+        }
+
+        cout << "\n Student data updated.\n";
+    }
+    else {
+        cout << "\n Username not found.\n";
+    }
+
     system("pause");
 }
 

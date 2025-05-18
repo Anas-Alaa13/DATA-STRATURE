@@ -5,28 +5,28 @@
 
 #include <string>
 #include <vector>
-
+using namespace std;
 struct User {
     int ID;
-    std::string FirstName;
-    std::string LastName;
-    std::string PhoneNumber;
-    std::string Username;
-    std::string Password;
-    std::string Email;
+     string FirstName;
+     string LastName;
+     string PhoneNumber;
+     string Username;
+     string Password;
+     string Email;
 };
 
 struct Course {
-    std::string title;
-    std::string syllabus;
-    std::string creditHours;
-    std::string instructor;
-    std::string prerequisites;
+     string title;
+     string syllabus;
+     string creditHours;
+     string instructor;
+     string prerequisites;
 };
 
 struct Grade {
     int ID;
-    std::string Subject;
+     string Subject;
     int Quiz;
     int Assignment;
     int Midterm;

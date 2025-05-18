@@ -12,38 +12,48 @@ using namespace std;
 
 void UserManager::login(DataManager& dm) {
     string username, password;
-    system("cls");
-    cout << "Please enter the following details:\n";
-    cout << "USERNAME: ";
-    cin >> username;
-    cout << "PASSWORD: ";
-    cin >> password;
 
-    bool isLoggedIn = false;
-    for (const auto& user : dm.users) {
-        if (user.Username == username && user.Password == password) {
-            isLoggedIn = true;
-            if (username == "admin") {
-                Admin admin(dm);
-                admin.displayMenu();
-            }
-            else {
-                Student student(dm);
-                student.setUsername(username);
-                student.setStudentID(user.ID);
-                student.displayMenu();
-            }
+    while (true) {  
+        system("cls");
+        cout << "Please enter the following details (or type 'exit' as username to quit):\n";
+        cout << "USERNAME: ";
+        cin >> username;
+        if (username == "exit") {
+            cout << "Exiting login...\n";
+            system("pause");
             break;
         }
-    }
 
-    if (isLoggedIn) {
-        cout << "\nHello " << username << "\n<LOGIN SUCCESSFUL>\nThanks for logging in..\n";
-    }
-    else {
+        cout << "PASSWORD: ";
+        cin >> password;
+
+        bool isLoggedIn = false;
+        for (const auto& user : dm.users) {
+            if (user.Username == username && user.Password == password) {
+                isLoggedIn = true;
+
+                if (username == "admin") {
+                    Admin admin(dm);
+                    cout << "\nHello " << username << "\n<LOGIN SUCCESSFUL>\nThanks for logging in..\n";
+                    system("pause");
+                    admin.displayMenu();
+                }
+                else {
+                    Student student(dm);
+                    student.setUsername(username);
+                    student.setStudentID(user.ID);
+                    cout << "\nHello " << username << "\n<LOGIN SUCCESSFUL>\nThanks for logging in..\n";
+                    system("pause");
+                    student.displayMenu();
+                }
+                return;
+            }
+        }
+
         cout << "\nLOGIN ERROR\nPlease check your username and password.\n";
+        cout << "Try again or type 'exit' as username to quit.\n";
+        system("pause");
     }
-    system("pause");
 }
 
 void UserManager::registerUser(DataManager& dm) {

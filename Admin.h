@@ -6,14 +6,13 @@
 #include <unordered_set>
 #include "DataManager.h"
 #include "Structures.h"
-
+#include <iostream>
 class Admin {
 private:
     DataManager& dm;
 
 public:
     Admin(DataManager& dm);
-
 
     //Anas
     void displayMenu();

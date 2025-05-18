@@ -102,7 +102,8 @@ void Student::displayMenu() {
             filterGrades();
             break;
         case 7:
-            cout << "Goodbye.\n";
+            cout << "Slaaaam YA Taleb.\n";
+			system("pause");
             return;
         default:
             cout << "Invalid choice, please try again.\n";
@@ -141,7 +142,7 @@ void Student::viewRegisteredCourses() {
 }
 
 
-//Kenzy
+//Kinzy
 bool Student::alreadyRegistered(const string& courseName) {
     auto it = dm.registrations.find(studentID);
     if (it != dm.registrations.end()) {
@@ -186,7 +187,7 @@ bool Student::isCourseValid(const string& courseName) {
         }
     }
     return false;
-}
+}///////////
 Course Student::findcourse(const string& searchName) {
     string searchLower = searchName;
     transform(searchLower.begin(), searchLower.end(), searchLower.begin(), ::tolower);
@@ -198,7 +199,7 @@ Course Student::findcourse(const string& searchName) {
         }
     }
     return Course();
-}
+}///////
 void Student::registercourse() {
     string courseName;
     cout << "Enter course name to register: ";
@@ -335,7 +336,7 @@ void Student::generateReport(const string& id) {
         }
     }
 
-    map<string, int> courseCreditHours;
+    unordered_map<string, int> courseCreditHours;
     for (const auto& course : dm.courses) {
         try {
             courseCreditHours[course.title] = course.creditHours.empty() ? 0 : stoi(course.creditHours);
