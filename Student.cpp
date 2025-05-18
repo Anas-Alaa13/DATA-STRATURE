@@ -143,63 +143,54 @@ void Student::viewRegisteredCourses() {
 
 
 //Kinzy
-bool Student::alreadyRegistered(const string& courseName) {
-    auto it = dm.registrations.find(studentID);
-    if (it != dm.registrations.end()) {
-        for (const auto& course : it->second) {
-            if (course == courseName) {
-                return true;
-            }
+void Student::buildRegisteredSet() const {
+    if (!isRegisteredSetBuilt) {
+        auto it = dm.registrations.find(studentID);
+        if (it != dm.registrations.end()) {
+            registeredSet = unordered_set<string>(it->second.begin(), it->second.end());
         }
+        isRegisteredSetBuilt = true;
     }
-    return false;
+}
+bool Student::alreadyRegistered(const string& courseName) {
+    buildRegisteredSet();
+    return registeredSet.count(courseName);
 }
 bool Student::prerequisitesMet(const string& prereq) {
     if (prereq.empty()) return true;
 
-    auto it = dm.registrations.find(studentID);
-    if (it != dm.registrations.end()) {
-        stringstream ss(prereq);
-        string singlePrereq;
-        while (getline(ss, singlePrereq, ',')) {
-            singlePrereq.erase(remove_if(singlePrereq.begin(), singlePrereq.end(), ::isspace), singlePrereq.end());
-            bool met = false;
-            for (const auto& course : it->second) {
-                if (course == singlePrereq) {
-                    met = true;
-                    break;
-                }
-            }
-            if (!met) return false;
-        }
-        return true;
+    buildRegisteredSet();
+
+    stringstream ss(prereq);
+    string singlePrereq;
+    while (getline(ss, singlePrereq, ',')) {
+        singlePrereq.erase(remove_if(singlePrereq.begin(), singlePrereq.end(), ::isspace), singlePrereq.end());
+        if (!registeredSet.count(singlePrereq)) return false;
     }
-    return false;
+    return true;
 }
 bool Student::isCourseValid(const string& courseName) {
     string inputLower = courseName;
     transform(inputLower.begin(), inputLower.end(), inputLower.begin(), ::tolower);
+
     for (const auto& course : dm.courses) {
         string titleLower = course.title;
         transform(titleLower.begin(), titleLower.end(), titleLower.begin(), ::tolower);
-        if (inputLower == titleLower) {
-            return true;
-        }
+        if (inputLower == titleLower) return true;
     }
     return false;
-}///////////
+}
 Course Student::findcourse(const string& searchName) {
     string searchLower = searchName;
     transform(searchLower.begin(), searchLower.end(), searchLower.begin(), ::tolower);
+
     for (const auto& course : dm.courses) {
         string titleLower = course.title;
         transform(titleLower.begin(), titleLower.end(), titleLower.begin(), ::tolower);
-        if (searchLower == titleLower) {
-            return course;
-        }
+        if (searchLower == titleLower) return course;
     }
     return Course();
-}///////
+}
 void Student::registercourse() {
     string courseName;
     cout << "Enter course name to register: ";
@@ -231,10 +222,10 @@ void Student::registercourse() {
     }
 
     dm.registrations[studentID].push_back(courseName);
+    isRegisteredSetBuilt = false; 
     cout << "Registered successfully.\n";
     system("pause");
 }
-
 
 //mohamed
 void Student::viewGrades() {

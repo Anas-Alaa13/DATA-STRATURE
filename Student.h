@@ -7,12 +7,18 @@
 #include <queue>
 #include "DataManager.h"
 #include "Structures.h"
-
+#include <unordered_set>
 class Student {
 private:
     int studentID;
     std::string username;
     DataManager& dm;
+
+
+    mutable unordered_set<string> registeredSet;
+    mutable bool isRegisteredSetBuilt = false;
+    void buildRegisteredSet() const;
+
 
 public:
     Student(DataManager& dm);
