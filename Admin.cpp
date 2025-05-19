@@ -32,6 +32,7 @@ void Admin::displayMenu() {
         cout << "5. Manage Student Grade " << endl;
         cout << "6. Delete user " << endl;
         cout << "7. EXIT" << endl;
+        cout << "8. Save Edits" << endl;
 
         string inputStr;
         while (true) {
@@ -76,11 +77,17 @@ void Admin::displayMenu() {
             cout << "Salaaaam Yaaa Admin.\n";
             system("pause");
             return;
+        case 8:
+           dm.saveAllData();
+            cout << "All changes saved successfully.\n";
+            system("pause");
+            break;
         default:
             cout << "Invalid choice, please try again.\n";
         }
     }
 }
+
 void Admin::deleteUser() {
     stack<User> deletedUsers;
 
@@ -130,7 +137,16 @@ void Admin::deleteUser() {
             continue;
         }
 
-        auto it = find_if(dm.users.begin(), dm.users.end(), [id](const User& u) { return u.ID == id; });
+        vector<User>::iterator it = dm.users.begin();
+        for (; it != dm.users.end(); ++it) {
+            if (it->ID == id) {
+                break; // لقينا اليوزر، نخرج من اللوب
+            }
+        }        if (it->Username == "admin") {
+            cout << "Cannot delete admin account.\n";
+            system("pause");
+            continue;
+        }
         if (it != dm.users.end()) {
             deletedUsers.push(*it);
             dm.users.erase(it);
@@ -141,9 +157,15 @@ void Admin::deleteUser() {
             cout << "User removed from registrations.\n";
         }
 
-        auto before = dm.grades.size();
-        dm.grades.erase(remove_if(dm.grades.begin(), dm.grades.end(),
-            [id](const Grade& g) { return g.ID == id; }), dm.grades.end());
+        size_t before = dm.grades.size();
+        for (auto it = dm.grades.begin(); it != dm.grades.end();) {
+            if (it->ID == id) {
+                it = dm.grades.erase(it);
+            }
+            else {
+                ++it;
+            }
+        }
         if (before != dm.grades.size()) {
             cout << "User removed from grades.\n";
         }
@@ -235,7 +257,7 @@ void Admin::SetPrerequisites() {
         if (isValidPrerequisites(prereqs)) {
             it->prerequisites = prereqs;
             cout << "Prerequisites updated successfully.\n";
-            dm.writeCourses("courses.csv");
+            // Removed: dm.writeCourses("courses.csv");
         }
         else {
             cout << "Invalid prerequisites. Update failed.\n";
