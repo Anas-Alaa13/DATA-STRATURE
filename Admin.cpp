@@ -87,7 +87,6 @@ void Admin::displayMenu() {
         }
     }
 }
-
 void Admin::deleteUser() {
     stack<User> deletedUsers;
 
@@ -194,7 +193,7 @@ void Admin::deleteUser() {
     system("pause");
 }
 
-//Framawy-Ahmed
+//Ahmed
 void Admin::ShowCourses() {
     cout << "\nCurrent Courses List:\n---------------------------------------\n";
 
@@ -269,6 +268,8 @@ void Admin::SetPrerequisites() {
 
     system("pause");
 }
+
+//Framawy
 void Admin::UploadCourse() {
     Course newCourse;
     cout << "\n--- Add New Course ---\n";
