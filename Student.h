@@ -1,54 +1,31 @@
-﻿#ifndef STUDENT_H
-#define STUDENT_H
-
+﻿// Student.h
+#pragma once
+#include "DataManager.h"
+#include "Structures.h"
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <queue>
-#include "DataManager.h"
-#include "Structures.h"
-#include <unordered_set>
+#include <map>
+
 class Student {
 private:
+    DataManager& dm;
     int studentID;
     std::string username;
-    DataManager& dm;
-
-
-    mutable unordered_set<string> registeredSet;
-    mutable bool isRegisteredSetBuilt = false;
-    void buildRegisteredSet() const;
-
 
 public:
     Student(DataManager& dm);
-
-    //Kenzy
-    void setUsername(const std::string& user);
+    void setUsername(const std::string& username);
     void setStudentID(int id);
     int getStudentID() const;
-    bool alreadyRegistered(const std::string& courseName);
-    bool prerequisitesMet(const std::string& prereq);
-    void registercourse();
-    Course findcourse(const std::string& searchName);
-    bool isCourseValid(const std::string& courseName);
-
-
-	//Mohamed
     std::string getUsername() const;
-    void viewGrades();
-    void filterGrades();
-
-
-	//Anas
-    void displayMenu();
-    void viewRegisteredCourses();
-
-
-
-
-   //Frah
-    void generateReport(const std::string& id);
+    bool registerCourse(const std::string& courseName, std::string& errorMessage);
+    Course findCourse(const std::string& courseName);
+    std::vector<Grade> getGrades();
+    std::vector<Grade> filterGrades(double minGPA);
+    std::vector<std::string> getRegisteredCourses();
+    std::string generateReport(const std::string& studentID);
+    bool prerequisitesMet(const std::string& courseName);
+    bool isCourseValid(const std::string& courseName);
+    bool alreadyRegistered(const std::string& courseName);
 };
-
-#endif

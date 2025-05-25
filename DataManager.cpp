@@ -1,9 +1,9 @@
-#include "DataManager.h"
+﻿#include "DataManager.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <algorithm>
-using namespace std;
+
 DataManager::DataManager() {
     readUsers("database.csv");
     readCourses("courses.csv");
@@ -11,69 +11,76 @@ DataManager::DataManager() {
     readGrades("grades.csv");
 }
 
-void DataManager::readUsers(const  string& filename) {
-     ifstream file(filename);
+void DataManager::readUsers(const std::string& filename) {
+    std::ifstream file(filename);
     if (!file.is_open()) {
-         cerr << "Error opening " << filename <<  endl;
+        std::cerr << "Error opening " << filename << std::endl;
         return;
     }
-     string line;
-     getline(file, line); 
-    while ( getline(file, line)) {
-         stringstream ss(line);
+    std::string line;
+    std::getline(file, line); // Skip header
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
         User user;
-         string temp;
-         getline(ss, temp, ','); user.ID =  stoi(temp);
-         getline(ss, user.FirstName, ',');
-         getline(ss, user.LastName, ',');
-         getline(ss, user.PhoneNumber, ',');
-         getline(ss, user.Username, ',');
-         getline(ss, user.Password, ',');
-         getline(ss, user.Email, ',');
+        std::string temp;
+        std::getline(ss, temp, ','); user.ID = std::stoi(temp);
+        std::getline(ss, user.FirstName, ',');
+        std::getline(ss, user.LastName, ',');
+        std::getline(ss, user.PhoneNumber, ',');
+        std::getline(ss, user.Username, ',');
+        std::getline(ss, user.Password, ',');
+        std::getline(ss, user.Email, ',');
         users.push_back(user);
     }
     file.close();
 }
 
-void DataManager::readCourses(const  string& filename) {
-     ifstream file(filename);
+void DataManager::readCourses(const std::string& filename) {
+    std::ifstream file(filename);
     if (!file.is_open()) {
-         cerr << "Error opening " << filename <<  endl;
+        std::cerr << "Error opening " << filename << std::endl;
         return;
     }
-     string line;
-     getline(file, line); 
-    while ( getline(file, line)) {
-         stringstream ss(line);
+    std::string line;
+    std::getline(file, line); // Skip header
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
         Course course;
-         getline(ss, course.title, ',');
-         getline(ss, course.syllabus, ',');
-         getline(ss, course.creditHours, ',');
-         getline(ss, course.instructor, ',');
-         getline(ss, course.prerequisites, ',');
+        std::string temp;
+        std::getline(ss, course.title, ',');
+        std::getline(ss, course.syllabus, ',');
+        std::getline(ss, temp, ','); // نقرأ creditHours كـ string مؤقتًا
+        try {
+            course.creditHours = std::stoi(temp); // نحوّله لـ int
+        }
+        catch (const std::exception& e) {
+            course.creditHours = 0; // قيمة افتراضية لو التحويل فشل
+            std::cerr << "Error converting creditHours for course " << course.title << ": " << e.what() << std::endl;
+        }
+        std::getline(ss, course.instructor, ',');
+        std::getline(ss, course.prerequisites, ',');
         courses.push_back(course);
-        courseTitles.insert(course.title); 
-
+        courseTitles.insert(course.title);
     }
     file.close();
 }
 
-void DataManager::readRegistrations(const  string& filename) {
-     ifstream file(filename);
+void DataManager::readRegistrations(const std::string& filename) {
+    std::ifstream file(filename);
     if (!file.is_open()) {
-         cerr << "Error opening " << filename <<  endl;
+        std::cerr << "Error opening " << filename << std::endl;
         return;
     }
-     string line;
-     getline(file, line); // Skip header
-    while ( getline(file, line)) {
-         stringstream ss(line);
-         string userIDStr;
-         getline(ss, userIDStr, ',');
-        int userID =  stoi(userIDStr);
-         vector< string> subjects;
-         string subject;
-        while ( getline(ss, subject, ',')) {
+    std::string line;
+    std::getline(file, line); // Skip header
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string userIDStr;
+        std::getline(ss, userIDStr, ',');
+        int userID = std::stoi(userIDStr);
+        std::vector<std::string> subjects;
+        std::string subject;
+        while (std::getline(ss, subject, ',')) {
             if (!subject.empty()) subjects.push_back(subject);
         }
         registrations[userID] = subjects;
@@ -81,36 +88,36 @@ void DataManager::readRegistrations(const  string& filename) {
     file.close();
 }
 
-void DataManager::readGrades(const  string& filename) {
-     ifstream file(filename);
+void DataManager::readGrades(const std::string& filename) {
+    std::ifstream file(filename);
     if (!file.is_open()) {
-         cerr << "Error opening " << filename <<  endl;
+        std::cerr << "Error opening " << filename << std::endl;
         return;
     }
-     string line;
-     getline(file, line); // Skip header
-    while ( getline(file, line)) {
-         stringstream ss(line);
+    std::string line;
+    std::getline(file, line); // Skip header
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
         Grade grade;
-         string temp;
-         getline(ss, temp, ','); grade.ID =  stoi(temp);
-         getline(ss, grade.Subject, ',');
-         getline(ss, temp, ','); grade.Quiz =  stoi(temp);
-         getline(ss, temp, ','); grade.Assignment =  stoi(temp);
-         getline(ss, temp, ','); grade.Midterm =  stoi(temp);
-         getline(ss, temp, ','); grade.Practical =  stoi(temp);
-         getline(ss, temp, ','); grade.Final =  stoi(temp);
-         getline(ss, temp, ','); grade.Total =  stoi(temp);
-         getline(ss, temp, ','); grade.GPA =  stod(temp);
+        std::string temp;
+        std::getline(ss, temp, ','); grade.ID = std::stoi(temp);
+        std::getline(ss, grade.Subject, ',');
+        std::getline(ss, temp, ','); grade.Quiz = std::stoi(temp);
+        std::getline(ss, temp, ','); grade.Assignment = std::stoi(temp);
+        std::getline(ss, temp, ','); grade.Midterm = std::stoi(temp);
+        std::getline(ss, temp, ','); grade.Practical = std::stoi(temp);
+        std::getline(ss, temp, ','); grade.Final = std::stoi(temp);
+        std::getline(ss, temp, ','); grade.Total = std::stoi(temp);
+        std::getline(ss, temp, ','); grade.GPA = std::stod(temp);
         grades.push_back(grade);
     }
     file.close();
 }
 
-void DataManager::writeUsers(const  string& filename) {
-     ofstream file(filename);
+void DataManager::writeUsers(const std::string& filename) {
+    std::ofstream file(filename);
     if (!file.is_open()) {
-         cerr << "Error writing to " << filename <<  endl;
+        std::cerr << "Error writing to " << filename << std::endl;
         return;
     }
     file << "ID,FirstName,LastName,PhoneNumber,Username,Password,Email\n";
@@ -122,10 +129,10 @@ void DataManager::writeUsers(const  string& filename) {
     file.close();
 }
 
-void DataManager::writeCourses(const  string& filename) {
-     ofstream file(filename);
+void DataManager::writeCourses(const std::string& filename) {
+    std::ofstream file(filename);
     if (!file.is_open()) {
-         cerr << "Error writing to " << filename <<  endl;
+        std::cerr << "Error writing to " << filename << std::endl;
         return;
     }
     file << "Course_Title,Syllabus,Credit_Hours,Instructor,Prerequisites\n";
@@ -136,10 +143,10 @@ void DataManager::writeCourses(const  string& filename) {
     file.close();
 }
 
-void DataManager::writeRegistrations(const  string& filename) {
-     ofstream file(filename);
+void DataManager::writeRegistrations(const std::string& filename) {
+    std::ofstream file(filename);
     if (!file.is_open()) {
-         cerr << "Error writing to " << filename <<  endl;
+        std::cerr << "Error writing to " << filename << std::endl;
         return;
     }
     int maxCourses = 0;
@@ -159,10 +166,10 @@ void DataManager::writeRegistrations(const  string& filename) {
     file.close();
 }
 
-void DataManager::writeGrades(const  string& filename) {
-     ofstream file(filename);
+void DataManager::writeGrades(const std::string& filename) {
+    std::ofstream file(filename);
     if (!file.is_open()) {
-         cerr << "Error writing to " << filename <<  endl;
+        std::cerr << "Error writing to " << filename << std::endl;
         return;
     }
     file << "ID,Subject,Quiz,Assignment,Midterm,Practical,Final,Total,GPA\n";

@@ -1,32 +1,30 @@
-//Helper To File
-
-#ifndef STRUCTURES_H
+﻿#ifndef STRUCTURES_H
 #define STRUCTURES_H
 
 #include <string>
 #include <vector>
-using namespace std;
+
 struct User {
     int ID;
-     string FirstName;
-     string LastName;
-     string PhoneNumber;
-     string Username;
-     string Password;
-     string Email;
+    std::string FirstName;
+    std::string LastName;
+    std::string PhoneNumber;
+    std::string Username;
+    std::string Password;
+    std::string Email;
 };
 
 struct Course {
-     string title;
-     string syllabus;
-     string creditHours;
-     string instructor;
-     string prerequisites;
+    std::string title;
+    std::string syllabus;
+    int creditHours;
+    std::string instructor;
+    std::string prerequisites;
 };
 
 struct Grade {
     int ID;
-     string Subject;
+    std::string Subject;
     int Quiz;
     int Assignment;
     int Midterm;
@@ -34,6 +32,17 @@ struct Grade {
     int Final;
     int Total;
     double GPA;
+};
+
+// في Structures.h
+struct StudentGrade {
+    int studentId;        // لربط الدرجات بـ ID الطالب
+    std::string subject;
+    int quiz;
+    int assignment;
+    int midterm;
+    int practical;
+    int finalExam;
 };
 
 #endif
